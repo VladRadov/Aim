@@ -1,0 +1,19 @@
+{
+    "name": "Aim.Editor",
+    "rootNamespace": "Aim.Editor",
+    "references": [
+        "Aim",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

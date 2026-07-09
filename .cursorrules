@@ -1,0 +1,27 @@
+# Project Rules & Architecture
+
+## Structure
+- Scripts: `Aim/Scripts/`
+- Sprites: `Aim/Sprites/`
+- Prefabs: `Aim/Prefabs/`
+
+## Architecture: Model-Controller-Presenter (MCP)
+- Every feature must be implemented using the MCP pattern to ensure strict separation of concerns.
+- **Model**: Pure C# classes (or Data-Oriented structs) containing only state and logic. No Unity dependencies (MonoBehaviour) where possible.
+- **Presenter**: Mediates between Model and View. Listens to Model changes and updates View.
+- **View**: MonoBehaviour classes responsible only for displaying data and capturing user input (UI/Input events).
+
+## Technology Stack
+- **Reactive Programming**: Use `UniRx` for all event-driven logic, state changes, and stream transformations.
+- **Asynchrony**: Use `UniTask` for all asynchronous operations. Do not use standard C# `Task` or Unity Coroutines if `UniTask` can handle it.
+- **Code Style**:
+    - Clean code principles.
+    - Strict adherence to DRY (Don't Repeat Yourself). Before creating a new class or method, check if an existing one can be reused or extended.
+    - Favor composition over inheritance.
+    - Inject dependencies (if using Zenject/VContainer, assume it's available).
+
+## Implementation Rules
+1. **Reuse**: Always scan the project for existing implementations of similar logic (e.g., input handling, object pooling) before writing new code.
+2. **Naming**: Follow C# naming conventions (PascalCase for classes/methods, camelCase for variables).
+3. **Optimizations**: For `Aim Trainer` mechanics, always use `Object Pooling` for targets/projectiles. Avoid `Instantiate` and `Destroy` in game loops.
+4. **Cleanliness**: Do not include unnecessary boilerplate. Keep components focused and small.
