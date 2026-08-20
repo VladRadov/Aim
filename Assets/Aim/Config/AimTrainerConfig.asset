@@ -19,7 +19,43 @@ MonoBehaviour:
   targetLayerMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  aimPointLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  bulletSpeed: 300
+  bulletPrefab: {fileID: -5812323179348409465, guid: f52bbad6a0abdf8469e861c41fce7439, type: 3}
+  muzzleFlashPrefab: {fileID: 3434191812484499170, guid: b0a227fc2e558f241b1c747820ccc361, type: 3}
+  hitEffectPrefab: {fileID: -5939106892088927135, guid: 5332791ebce075d4a9e56f4581e7fb47, type: 3}
+  muzzleFxFallbackDuration: 0.6
+  hitFxFallbackDuration: 1.2
   crosshairDefaultColor: {r: 1, g: 1, b: 1, a: 1}
   crosshairHitColor: {r: 1, g: 0.35, b: 0.35, a: 1}
   crosshairHitFlashDuration: 0.12
   weaponMountLocalPosition: {x: 0.25, y: -0.2, z: 0.45}
+  recoilWeaponPitch: 3.5
+  recoilWeaponYawRange: 1.2
+  recoilWeaponRollRange: 1.5
+  recoilWeaponKickback: 0.035
+  recoilRecoverySpeed: 14
+  recoilCameraPitch: 0.55
+  recoilCameraYawRange: 0.2
+  coinsPerHit: 1
+  coinsWinBonus: 10
+  levels:
+  - {fileID: 11400000, guid: f11c7002a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7105a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7203a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7303a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7406a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7503a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: f11c7606a2b3c4d5e6f708192a3b4c5d, type: 2}
+  - {fileID: 11400000, guid: b7d2cd87a1920694390923be36fc92da, type: 2}
+  - {fileID: 11400000, guid: c76c6a0d357c36f4fa58d8078840a24e, type: 2}
+  - {fileID: 11400000, guid: e0a6b3c41d9f608a0c2e3f4a5b6c7d8e, type: 2}
+  - {fileID: 11400000, guid: ccf3a459697911a01234567890abcdef, type: 2}
+  - {fileID: 11400000, guid: b6b56f9e19d2ffb4fb4c980e612af480, type: 2}
+  - {fileID: 11400000, guid: 97206f98f9e5c724d96b7df89e189ef3, type: 2}
+  - {fileID: 11400000, guid: a1b2c3d4e5f6478890a1b2c3d4e5f704, type: 2}
+  - {fileID: 11400000, guid: 1cb45b81f3f7f66418016ef257522764, type: 2}
+  - {fileID: 11400000, guid: f87477600af8541479f7db72033f5aea, type: 2}
+  - {fileID: 11400000, guid: 66f708192536bcc345d6e7f801234567, type: 2}

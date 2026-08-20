@@ -15,9 +15,11 @@ namespace Aim.Views
 
         InputAction _lookAction;
         InputAction _attackAction;
+        bool _uiCapture;
 
         public IObservable<Vector2> LookStream => _lookSubject;
         public IObservable<Unit> AttackStream => _attackSubject;
+        public bool IsUiCapture => _uiCapture;
 
         void Awake()
         {
@@ -30,11 +32,15 @@ namespace Aim.Views
         {
             _lookAction.Enable();
             _attackAction.Enable();
-            LockCursor();
+            if (!_uiCapture)
+                LockCursor();
 
             Observable.EveryUpdate()
                 .Subscribe(_ =>
                 {
+                    if (_uiCapture)
+                        return;
+
                     var lookDelta = _lookAction.ReadValue<Vector2>();
                     if (lookDelta != Vector2.zero)
                         _lookSubject.OnNext(lookDelta);
@@ -42,12 +48,9 @@ namespace Aim.Views
                     if (_attackAction.WasPressedThisFrame())
                         _attackSubject.OnNext(Unit.Default);
 
-                    if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-                        UnlockCursor();
-
                     if (Mouse.current != null &&
                         Mouse.current.leftButton.wasPressedThisFrame &&
-                        Cursor.lockState != CursorLockMode.Locked)
+                        Cursor.visible)
                         LockCursor();
                 })
                 .AddTo(_disposables);
@@ -67,9 +70,19 @@ namespace Aim.Views
             _disposables.Dispose();
         }
 
+        public void SetUiCapture(bool enabled)
+        {
+            _uiCapture = enabled;
+            if (enabled)
+                UnlockCursor();
+            else
+                LockCursor();
+        }
+
         public void LockCursor()
         {
-            Cursor.lockState = CursorLockMode.Locked;
+            // Confined + hidden keeps mouse look via delta, but UI (settings gear) stays clickable.
+            Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = false;
         }
 

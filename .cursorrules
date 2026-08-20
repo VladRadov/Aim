@@ -1,27 +1,28 @@
-# Project Rules & Architecture
+# Project Rules & Architecture Standards
 
-## Structure
+## 1. Directory Structure
 - Scripts: `Aim/Scripts/`
 - Sprites: `Aim/Sprites/`
 - Prefabs: `Aim/Prefabs/`
 
-## Architecture: Model-Controller-Presenter (MCP)
-- Every feature must be implemented using the MCP pattern to ensure strict separation of concerns.
-- **Model**: Pure C# classes (or Data-Oriented structs) containing only state and logic. No Unity dependencies (MonoBehaviour) where possible.
-- **Presenter**: Mediates between Model and View. Listens to Model changes and updates View.
-- **View**: MonoBehaviour classes responsible only for displaying data and capturing user input (UI/Input events).
+## 2. Architecture & Design Principles
+- **SOLID & DRY**: 
+  - Strictly follow SOLID principles for all C# classes.
+  - Adhere to DRY (Don't Repeat Yourself). Always check existing code in `Aim/Scripts/` for reusable utilities or base classes before writing new logic.
+- **MCP Pattern (Model-Controller-Presenter)**:
+  - **Model**: Pure C# classes/structs containing state and core logic (no `MonoBehaviour`).
+  - **Presenter**: Coordinator/Mediator using `UniRx` and `UniTask` to link Model and View.
+  - **View**: `MonoBehaviour` classes responsible only for UI rendering and capturing input.
 
-## Technology Stack
-- **Reactive Programming**: Use `UniRx` for all event-driven logic, state changes, and stream transformations.
-- **Asynchrony**: Use `UniTask` for all asynchronous operations. Do not use standard C# `Task` or Unity Coroutines if `UniTask` can handle it.
-- **Code Style**:
-    - Clean code principles.
-    - Strict adherence to DRY (Don't Repeat Yourself). Before creating a new class or method, check if an existing one can be reused or extended.
-    - Favor composition over inheritance.
-    - Inject dependencies (if using Zenject/VContainer, assume it's available).
+## 3. Unity Performance & Optimization Rules
+- **Prohibited Methods**:
+  - **NEVER** use `Object.FindObjectOfType`, `GameObject.Find`, `GameObject.FindWithTag`, or any global scene searches. This severely damages performance in WebGL.
+- **Component Caching**:
+  - **NEVER** call `GetComponent` inside `Update()`, `FixedUpdate()`, or performance-critical loops.
+  - Prefer injecting component references explicitly via Inspector (`[SerializeField]`) or setup methods.
+  - If `GetComponent` is required, call it **strictly once** during `Awake()` or initialization and cache the result.
 
-## Implementation Rules
-1. **Reuse**: Always scan the project for existing implementations of similar logic (e.g., input handling, object pooling) before writing new code.
-2. **Naming**: Follow C# naming conventions (PascalCase for classes/methods, camelCase for variables).
-3. **Optimizations**: For `Aim Trainer` mechanics, always use `Object Pooling` for targets/projectiles. Avoid `Instantiate` and `Destroy` in game loops.
-4. **Cleanliness**: Do not include unnecessary boilerplate. Keep components focused and small.
+## 4. Tech Stack Guidelines
+- **Reactive Streams**: Use `UniRx` for state bindings, event streams, and reactive logic.
+- **Asynchrony**: Use `UniTask` instead of standard C# `Task` or Unity Coroutines.
+- **Object Pooling**: Mandatory for targets, projectiles, and frequently spawned objects. Avoid `Instantiate` and `Destroy` during runtime loops.

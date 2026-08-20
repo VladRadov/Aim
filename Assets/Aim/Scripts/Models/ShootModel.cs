@@ -16,7 +16,7 @@ namespace Aim.Models
         public void RegisterShot(ShootResult result)
         {
             _shots.Value++;
-            if (result.DidHit)
+            if (result.CountsAsScore)
                 _hits.Value++;
 
             _lastResult.Value = result;

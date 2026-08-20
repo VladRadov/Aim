@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6478890a1b2c3d4e5f811, type: 3}
+  m_Name: WeaponShopCatalog
+  m_EditorClassIdentifier: 
+  weapons:
+  - id: pistol_k
+    displayName: Pistol K
+    prefab: {fileID: 6921181078332899429, guid: c8c15cb8303fc6541b0383d8490513f1, type: 3}
+    price: 0
+    icon: {fileID: 21300000, guid: b1c2d3e4f5a6478890a1b2c3d4e5f825, type: 3}
+    ownedByDefault: 1
+  - id: pistol_l
+    displayName: Pistol L
+    prefab: {fileID: 7510047628050627302, guid: ddf3b5ebd69927e45898162a0fd6d537, type: 3}
+    price: 50
+    icon: {fileID: 21300000, guid: b1c2d3e4f5a6478890a1b2c3d4e5f824, type: 3}
+    ownedByDefault: 0
+  - id: pistol_m
+    displayName: Pistol M
+    prefab: {fileID: 6324642108869202198, guid: 507d8cb43e54af44994100528c4da5fe, type: 3}
+    price: 100
+    icon: {fileID: 21300000, guid: b1c2d3e4f5a6478890a1b2c3d4e5f823, type: 3}
+    ownedByDefault: 0
+  - id: pistol_n
+    displayName: Pistol N
+    prefab: {fileID: 609502448958473804, guid: db5e776609261fd48b1b120cab91f706, type: 3}
+    price: 150
+    icon: {fileID: 21300000, guid: b1c2d3e4f5a6478890a1b2c3d4e5f822, type: 3}
+    ownedByDefault: 0
+  - id: pistol_o
+    displayName: Pistol O
+    prefab: {fileID: 577448047493605433, guid: f506b236a9d35894b8a8ed910783ad82, type: 3}
+    price: 200
+    icon: {fileID: 21300000, guid: b1c2d3e4f5a6478890a1b2c3d4e5f821, type: 3}
+    ownedByDefault: 0
+  - id: pistol_k_preset
+    displayName: Pistol K PreSet
+    prefab: {fileID: 6469243681722169322, guid: 12bd9c22b85167a4e9a71a7db8bdd109, type: 3}
+    price: 250
+    icon: {fileID: 21300000, guid: 7772a1cb32d422d46b4079bf3cd136e9, type: 3}
+    ownedByDefault: 0
+  - id: pistol_l_preset
+    displayName: Pistol L PreSet
+    prefab: {fileID: 1975074354736041987, guid: 4e4e22e568b73de4fb0afa47a6cfffc2, type: 3}
+    price: 300
+    icon: {fileID: 21300000, guid: 34d511fe55f1ced4eb16c2940f74dca6, type: 3}
+    ownedByDefault: 0
+  - id: pistol_m_preset
+    displayName: Pistol M PreSet
+    prefab: {fileID: 4343141129967477887, guid: fcd8ebdc355a9a446b960279a216263b, type: 3}
+    price: 350
+    icon: {fileID: 21300000, guid: 5136e0a5b933a994f971b9d330f010e6, type: 3}
+    ownedByDefault: 0
+  - id: pistol_n_preset
+    displayName: Pistol N PreSet
+    prefab: {fileID: 8888474001013503031, guid: 658a50dac9af26344b1cba028991fb8d, type: 3}
+    price: 400
+    icon: {fileID: 21300000, guid: 0045cafbf47d3364e8552eda4e71b09d, type: 3}
+    ownedByDefault: 0
+  - id: pistol_o_preset
+    displayName: Pistol O PreSet
+    prefab: {fileID: 6830453203438795538, guid: 9f16c1dc17acb9746b5dc2e2ff631208, type: 3}
+    price: 450
+    icon: {fileID: 21300000, guid: c7a02f8aa1b86014db348a4fc15a2c72, type: 3}
+    ownedByDefault: 0

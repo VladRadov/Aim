@@ -20,7 +20,7 @@ namespace Aim.Presenters
         public void Initialize()
         {
             _shootModel.LastResult
-                .Where(result => result.DidHit)
+                .Where(result => result.CountsAsScore)
                 .Subscribe(_ => _crosshairView.FlashHit())
                 .AddTo(_disposables);
         }

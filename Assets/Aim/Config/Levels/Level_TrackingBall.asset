@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9f5a2b30c8e5f7a9b1d2e3f4a5b6c7d, type: 3}
+  m_Name: Level_TrackingBall
+  m_EditorClassIdentifier: 
+  displayName: Tracking Ball
+  requiredHits: 8
+  ammo: 0
+  allowsShooting: 0
+  autoStart: 1
+  spawnCenter: {x: 0, y: 0.45, z: 8}
+  spawnSize: {x: 6, y: 2.5, z: 4}
+  minSpawnDistance: 1.1
+  trackingPrefab: {fileID: 7102844162938571606, guid: f1a2b3c4d5e6478890a1b2c3d4e5f801, type: 3}
+  maxHealth: 100
+  drainPerSecond: 40
+  minUpwardSpeed: 6
+  maxUpwardSpeed: 15
+  lateralSpeed: 2
+  bounciness: 1
+  respawnDelay: 0.35
+  aimMaxDistance: 200

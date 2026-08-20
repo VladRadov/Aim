@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6478890a1b2c3d4e5f603, type: 3}
+  m_Name: Level_CustomHitZones
+  m_EditorClassIdentifier: 
+  displayName: Custom Zones
+  requiredHits: 10
+  ammo: 34
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 2, z: 7.7}
+  spawnSize: {x: 8, y: 0, z: 0.5}
+  minSpawnDistance: 1.8
+  customTargetPrefab: {fileID: 1884350238933053757, guid: affa38a0f4a447e4d80ac714cd7c5807, type: 3}
+  customSpawnPoints: []
+  respawnCustomOnHit: 1
+  customRespawnDelay: 0.4

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99fb4a1b54237d54788d5dfa53d459f9, type: 3}
+  m_Name: Level_BouncingBalls
+  m_EditorClassIdentifier: 
+  displayName: Bouncing Balls
+  requiredHits: 12
+  ammo: 32
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 0.45, z: 8}
+  spawnSize: {x: 6, y: 2.5, z: 4}
+  minSpawnDistance: 1.1
+  bouncingPrefab: {fileID: 5047551125725756790, guid: 146d43cd99f62ee46b595634c8f588a0, type: 3}
+  spawnInterval: 0.55
+  maxAlive: 6
+  minUpwardSpeed: 3
+  maxUpwardSpeed: 9
+  lateralSpeed: 1.8
+  lifeTime: 0
+  bounciness: 1

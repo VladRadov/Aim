@@ -24,6 +24,7 @@ namespace Aim.Views
         bool _isFlashing;
 
         public bool IsActive => _isActive && gameObject.activeInHierarchy;
+        public bool CountsAsScore => IsActive;
 
         public void Initialize(TargetPool pool)
         {

@@ -1,5 +1,5 @@
+using Aim;
 using Aim.Config;
-using Aim.Controllers;
 using Aim.Views;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -67,25 +67,32 @@ namespace Aim.Editor
             var crosshairView = uiRoot.AddComponent<CrosshairView>();
             SetPrivateField(crosshairView, "dotImage", crosshairDot);
 
-            var projectilesRoot = new GameObject("Projectiles").transform;
-            projectilesRoot.SetParent(playerRoot.transform, false);
+            var sessionHud = EnsureSessionHud(uiRoot.transform.parent as RectTransform ?? uiRoot.GetComponentInParent<Canvas>().transform);
+            var coinsHud = EnsureCoinsHud(uiRoot.transform.parent as RectTransform ?? uiRoot.GetComponentInParent<Canvas>().transform);
 
-            var controller = playerRoot.AddComponent<AimTrainerController>();
-            SetPrivateField(controller, "config", config);
-            SetPrivateField(controller, "inputView", inputView);
-            SetPrivateField(controller, "cameraLookView", cameraLookView);
-            SetPrivateField(controller, "weaponView", weaponView);
-            SetPrivateField(controller, "crosshairView", crosshairView);
-            SetPrivateField(controller, "shootCamera", cameraGo.GetComponent<Camera>());
-            SetPrivateField(controller, "projectilesRoot", projectilesRoot);
+            var projectilesRoot = new GameObject("Projectiles").transform;
+            var targetsRoot = new GameObject("LevelTargets").transform;
+
+            var bootstrapGo = new GameObject("Bootstrap");
+            var bootstrap = bootstrapGo.AddComponent<Bootstrap>();
+            SetPrivateField(bootstrap, "config", config);
+            SetPrivateField(bootstrap, "inputView", inputView);
+            SetPrivateField(bootstrap, "cameraLookView", cameraLookView);
+            SetPrivateField(bootstrap, "weaponView", weaponView);
+            SetPrivateField(bootstrap, "crosshairView", crosshairView);
+            SetPrivateField(bootstrap, "sessionHudView", sessionHud);
+            SetPrivateField(bootstrap, "coinsHudView", coinsHud);
+            SetPrivateField(bootstrap, "shootCamera", cameraGo.GetComponent<Camera>());
+            SetPrivateField(bootstrap, "projectilesRoot", projectilesRoot);
+            SetPrivateField(bootstrap, "targetsRoot", targetsRoot);
 
             EnsureMainThreadDispatcher();
             CreateTrainingArena(config);
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            Selection.activeGameObject = playerRoot;
+            Selection.activeGameObject = bootstrapGo;
 
-            Debug.Log("Aim trainer scene setup complete. Assign your weapon prefab on AimTrainerController if needed.");
+            Debug.Log("Aim trainer scene setup complete. Assign your weapon prefab on Bootstrap if needed.");
         }
 
         static void EnsureTargetLayer()
@@ -159,6 +166,349 @@ namespace Aim.Editor
             crosshairDot.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
 
             return crosshairGo;
+        }
+
+        static SessionHudView EnsureSessionHud(Transform canvasTransform)
+        {
+            var existing = Object.FindAnyObjectByType<SessionHudView>();
+            if (existing != null)
+            {
+                RebuildSessionCounters(existing);
+                return existing;
+            }
+
+            var hudGo = new GameObject("SessionHud", typeof(RectTransform));
+            hudGo.transform.SetParent(canvasTransform, false);
+
+            var rootRect = hudGo.GetComponent<RectTransform>();
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+
+            var state = CreateHudLabel(hudGo.transform, "StateText", new Vector2(0.5f, 0.5f), Vector2.zero, 36, TextAnchor.MiddleCenter);
+            state.color = new Color(1f, 0.85f, 0.2f, 1f);
+
+            var hitsText = CreateStatCounter(
+                hudGo.transform,
+                "HitsCounter",
+                new Vector2(-130f, -18f),
+                "Assets/Aim/Sprites/hits_icon.png",
+                new Color(0.94f, 0.94f, 0.96f, 0.95f),
+                out var hitsIcon,
+                out var hitsGroup);
+
+            var ammoText = CreateStatCounter(
+                hudGo.transform,
+                "AmmoCounter",
+                new Vector2(130f, -18f),
+                "Assets/Aim/Sprites/ammo_icon.png",
+                new Color(0.94f, 0.94f, 0.96f, 0.95f),
+                out var ammoIcon,
+                out var ammoGroup);
+
+            var hud = hudGo.AddComponent<SessionHudView>();
+            SetPrivateField(hud, "hitsText", hitsText);
+            SetPrivateField(hud, "ammoText", ammoText);
+            SetPrivateField(hud, "stateText", state);
+            SetPrivateField(hud, "hitsIcon", hitsIcon);
+            SetPrivateField(hud, "ammoIcon", ammoIcon);
+            SetPrivateField(hud, "hitsGroup", hitsGroup);
+            SetPrivateField(hud, "ammoGroup", ammoGroup);
+            return hud;
+        }
+
+        [MenuItem("Aim/Rebuild Session HUD")]
+        public static void RebuildSessionHudMenu()
+        {
+            var canvas = Object.FindAnyObjectByType<Canvas>();
+            if (canvas == null)
+            {
+                Debug.LogWarning("No Canvas found. Run Aim/Setup Game Scene first.");
+                return;
+            }
+
+            var hud = Object.FindAnyObjectByType<SessionHudView>();
+            if (hud == null)
+                hud = EnsureSessionHud(canvas.transform);
+            else
+                RebuildSessionCounters(hud);
+
+            var bootstrap = Object.FindAnyObjectByType<Bootstrap>();
+            if (bootstrap != null)
+                SetPrivateField(bootstrap, "sessionHudView", hud);
+
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            Selection.activeGameObject = hud.gameObject;
+            Debug.Log("Session HUD rebuilt (hits + ammo with circle icons) and linked to Bootstrap.");
+        }
+
+        [MenuItem("Aim/Rebuild Ammo HUD")]
+        public static void RebuildAmmoHudMenu() => RebuildSessionHudMenu();
+
+        [MenuItem("Aim/Rebuild Coins HUD")]
+        public static void RebuildCoinsHudMenu()
+        {
+            var canvas = Object.FindAnyObjectByType<Canvas>();
+            if (canvas == null)
+            {
+                Debug.LogWarning("No Canvas found. Run Aim/Setup Game Scene first.");
+                return;
+            }
+
+            var coinsHud = EnsureCoinsHud(canvas.transform);
+            var bootstrap = Object.FindAnyObjectByType<Bootstrap>();
+            if (bootstrap != null)
+                SetPrivateField(bootstrap, "coinsHudView", coinsHud);
+
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            Selection.activeGameObject = coinsHud.gameObject;
+            Debug.Log("Coins HUD rebuilt (top-left) and linked to Bootstrap.");
+        }
+
+        static CoinsHudView EnsureCoinsHud(Transform canvasTransform)
+        {
+            var existing = Object.FindAnyObjectByType<CoinsHudView>();
+            if (existing != null)
+            {
+                RebuildCoinsCounter(existing);
+                return existing;
+            }
+
+            var coinsGo = new GameObject("CoinsHud", typeof(RectTransform));
+            coinsGo.transform.SetParent(canvasTransform, false);
+
+            var rootRect = coinsGo.GetComponent<RectTransform>();
+            rootRect.anchorMin = Vector2.zero;
+            rootRect.anchorMax = Vector2.one;
+            rootRect.offsetMin = Vector2.zero;
+            rootRect.offsetMax = Vector2.zero;
+
+            var coinsText = CreateCornerCoinCounter(
+                coinsGo.transform,
+                "CoinsCounter",
+                out var coinsIcon);
+
+            var coinsHud = coinsGo.AddComponent<CoinsHudView>();
+            SetPrivateField(coinsHud, "coinsText", coinsText);
+            SetPrivateField(coinsHud, "coinsIcon", coinsIcon);
+            return coinsHud;
+        }
+
+        static void RebuildCoinsCounter(CoinsHudView coinsHud)
+        {
+            DestroyChildIfExists(coinsHud.transform, "CoinsCounter");
+
+            var coinsText = CreateCornerCoinCounter(
+                coinsHud.transform,
+                "CoinsCounter",
+                out var coinsIcon);
+
+            SetPrivateField(coinsHud, "coinsText", coinsText);
+            SetPrivateField(coinsHud, "coinsIcon", coinsIcon);
+        }
+
+        static Text CreateCornerCoinCounter(Transform parent, string name, out Image iconImage)
+        {
+            var counterGo = new GameObject(name, typeof(RectTransform), typeof(CanvasGroup));
+            counterGo.transform.SetParent(parent, false);
+            var group = counterGo.GetComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+
+            var counterRect = counterGo.GetComponent<RectTransform>();
+            counterRect.anchorMin = new Vector2(0f, 1f);
+            counterRect.anchorMax = new Vector2(0f, 1f);
+            counterRect.pivot = new Vector2(0f, 1f);
+            counterRect.anchoredPosition = new Vector2(18f, -18f);
+            counterRect.sizeDelta = new Vector2(180f, 56f);
+
+            var layout = counterGo.AddComponent<HorizontalLayoutGroup>();
+            layout.childAlignment = TextAnchor.MiddleLeft;
+            layout.spacing = 10f;
+            layout.padding = new RectOffset(8, 14, 4, 4);
+            layout.childControlWidth = false;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+
+            var panel = counterGo.AddComponent<Image>();
+            panel.color = new Color(0f, 0f, 0f, 0.4f);
+            panel.raycastTarget = false;
+            panel.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd");
+            panel.type = Image.Type.Sliced;
+
+            var circleGo = new GameObject("IconCircle", typeof(RectTransform));
+            circleGo.transform.SetParent(counterGo.transform, false);
+            var circleRect = circleGo.GetComponent<RectTransform>();
+            circleRect.sizeDelta = new Vector2(44f, 44f);
+
+            var circleImage = circleGo.AddComponent<Image>();
+            circleImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            circleImage.color = new Color(0.94f, 0.94f, 0.96f, 0.95f);
+            circleImage.raycastTarget = false;
+            circleImage.preserveAspect = true;
+
+            var iconGo = new GameObject("Icon", typeof(RectTransform));
+            iconGo.transform.SetParent(circleGo.transform, false);
+            var iconRect = iconGo.GetComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
+            iconRect.sizeDelta = new Vector2(28f, 28f);
+            iconImage = iconGo.AddComponent<Image>();
+            iconImage.raycastTarget = false;
+            iconImage.preserveAspect = true;
+            iconImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Aim/Sprites/coin_icon.png");
+            iconImage.color = Color.white;
+
+            var textGo = new GameObject("ValueText", typeof(RectTransform));
+            textGo.transform.SetParent(counterGo.transform, false);
+            var textRect = textGo.GetComponent<RectTransform>();
+            textRect.sizeDelta = new Vector2(100f, 40f);
+            var valueText = textGo.AddComponent<Text>();
+            valueText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            valueText.fontSize = 26;
+            valueText.fontStyle = FontStyle.Bold;
+            valueText.alignment = TextAnchor.MiddleLeft;
+            valueText.color = Color.white;
+            valueText.raycastTarget = false;
+            valueText.text = "0";
+
+            return valueText;
+        }
+
+        static void RebuildSessionCounters(SessionHudView hud)
+        {
+            DestroyChildIfExists(hud.transform, "HitsText");
+            DestroyChildIfExists(hud.transform, "HitsCounter");
+            DestroyChildIfExists(hud.transform, "AmmoCounter");
+
+            var hitsText = CreateStatCounter(
+                hud.transform,
+                "HitsCounter",
+                new Vector2(-130f, -18f),
+                "Assets/Aim/Sprites/hits_icon.png",
+                new Color(0.94f, 0.94f, 0.96f, 0.95f),
+                out var hitsIcon,
+                out var hitsGroup);
+
+            var ammoText = CreateStatCounter(
+                hud.transform,
+                "AmmoCounter",
+                new Vector2(130f, -18f),
+                "Assets/Aim/Sprites/ammo_icon.png",
+                new Color(0.94f, 0.94f, 0.96f, 0.95f),
+                out var ammoIcon,
+                out var ammoGroup);
+
+            SetPrivateField(hud, "hitsText", hitsText);
+            SetPrivateField(hud, "ammoText", ammoText);
+            SetPrivateField(hud, "hitsIcon", hitsIcon);
+            SetPrivateField(hud, "ammoIcon", ammoIcon);
+            SetPrivateField(hud, "hitsGroup", hitsGroup);
+            SetPrivateField(hud, "ammoGroup", ammoGroup);
+        }
+
+        static void DestroyChildIfExists(Transform parent, string childName)
+        {
+            var child = parent.Find(childName);
+            if (child != null)
+                Object.DestroyImmediate(child.gameObject);
+        }
+
+        static Text CreateStatCounter(
+            Transform parent,
+            string name,
+            Vector2 anchoredPosition,
+            string iconAssetPath,
+            Color circleColor,
+            out Image iconImage,
+            out CanvasGroup group)
+        {
+            var counterGo = new GameObject(name, typeof(RectTransform), typeof(CanvasGroup));
+            counterGo.transform.SetParent(parent, false);
+            group = counterGo.GetComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+
+            var counterRect = counterGo.GetComponent<RectTransform>();
+            counterRect.anchorMin = new Vector2(0.5f, 1f);
+            counterRect.anchorMax = new Vector2(0.5f, 1f);
+            counterRect.pivot = new Vector2(0.5f, 1f);
+            counterRect.anchoredPosition = anchoredPosition;
+            counterRect.sizeDelta = new Vector2(200f, 56f);
+
+            var layout = counterGo.AddComponent<HorizontalLayoutGroup>();
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.spacing = 10f;
+            layout.padding = new RectOffset(8, 14, 4, 4);
+            layout.childControlWidth = false;
+            layout.childControlHeight = false;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+
+            var panel = counterGo.AddComponent<Image>();
+            panel.color = new Color(0f, 0f, 0f, 0.4f);
+            panel.raycastTarget = false;
+            panel.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Background.psd");
+            panel.type = Image.Type.Sliced;
+
+            var circleGo = new GameObject("IconCircle", typeof(RectTransform));
+            circleGo.transform.SetParent(counterGo.transform, false);
+            var circleRect = circleGo.GetComponent<RectTransform>();
+            circleRect.sizeDelta = new Vector2(44f, 44f);
+
+            var circleImage = circleGo.AddComponent<Image>();
+            circleImage.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            circleImage.color = circleColor;
+            circleImage.raycastTarget = false;
+            circleImage.preserveAspect = true;
+
+            var iconGo = new GameObject("Icon", typeof(RectTransform));
+            iconGo.transform.SetParent(circleGo.transform, false);
+            var iconRect = iconGo.GetComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+            iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+            iconRect.pivot = new Vector2(0.5f, 0.5f);
+            iconRect.sizeDelta = new Vector2(28f, 28f);
+            iconImage = iconGo.AddComponent<Image>();
+            iconImage.raycastTarget = false;
+            iconImage.preserveAspect = true;
+            iconImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(iconAssetPath);
+            iconImage.color = Color.white;
+
+            var textGo = new GameObject("ValueText", typeof(RectTransform));
+            textGo.transform.SetParent(counterGo.transform, false);
+            var textRect = textGo.GetComponent<RectTransform>();
+            textRect.sizeDelta = new Vector2(120f, 40f);
+            var valueText = textGo.AddComponent<Text>();
+            valueText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            valueText.fontSize = 26;
+            valueText.fontStyle = FontStyle.Bold;
+            valueText.alignment = TextAnchor.MiddleLeft;
+            valueText.color = Color.white;
+            valueText.raycastTarget = false;
+            valueText.text = "0 / 0";
+
+            return valueText;
+        }
+
+        static Text CreateHudLabel(Transform parent, string name, Vector2 anchor, Vector2 anchoredPos, int fontSize, TextAnchor alignment)
+        {
+            var labelGo = new GameObject(name, typeof(RectTransform));
+            labelGo.transform.SetParent(parent, false);
+            var rect = labelGo.GetComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot = anchor;
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = new Vector2(360f, 40f);
+            var text = labelGo.AddComponent<Text>();
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = fontSize;
+            text.alignment = alignment;
+            text.color = Color.white;
+            text.raycastTarget = false;
+            return text;
         }
 
         static void EnsureMainThreadDispatcher()

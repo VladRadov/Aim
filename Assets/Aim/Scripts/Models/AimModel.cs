@@ -26,6 +26,12 @@ namespace Aim.Models
             _pitch.Value = Mathf.Clamp(_pitch.Value - delta.y * sensitivity, _minPitch, _maxPitch);
         }
 
+        public void ApplyRecoilKick(float pitchKick, float yawKick)
+        {
+            _pitch.Value = Mathf.Clamp(_pitch.Value - pitchKick, _minPitch, _maxPitch);
+            _yaw.Value += yawKick;
+        }
+
         public void Dispose()
         {
             _yaw.Dispose();

@@ -1,0 +1,232 @@
+using Aim.Config;
+using Aim.Models;
+using Aim.Services;
+using Aim.Views;
+using UnityEngine;
+
+namespace Aim
+{
+    public sealed class Bootstrap : MonoBehaviour
+    {
+        [Header("Config")]
+        [SerializeField] AimTrainerConfig config;
+        [SerializeField] GameObject weaponPrefab;
+        [SerializeField] WeaponShopCatalog weaponShopCatalog;
+
+        [Header("Player Views")]
+        [SerializeField] InputView inputView;
+        [SerializeField] CameraLookView cameraLookView;
+        [SerializeField] WeaponView weaponView;
+        [SerializeField] Camera shootCamera;
+
+        [Header("UI Views")]
+        [SerializeField] CrosshairView crosshairView;
+        [SerializeField] SessionHudView sessionHudView;
+        [SerializeField] CoinsHudView coinsHudView;
+        [SerializeField] SettingsView settingsView;
+        [SerializeField] ShopView shopView;
+        [SerializeField] LevelWinView levelWinView;
+
+        [Header("World")]
+        [SerializeField] Transform projectilesRoot;
+        [SerializeField] Transform targetsRoot;
+        [SerializeField] AudioSource musicSource;
+        [SerializeField] AudioSource sfxSource;
+
+        SessionModel _sessionModel;
+        SettingsModel _settingsModel;
+        CoinsModel _coinsModel;
+        LevelWinModel _levelWinModel;
+        ShopModel _shopModel;
+
+        GameplayService _gameplayService;
+        HudService _hudService;
+        SettingsMenuService _settingsMenuService;
+        ShopMenuService _shopMenuService;
+        LevelService _levelService;
+
+        void Awake()
+        {
+            ResolveSceneDependencies();
+            InitializeServices();
+        }
+
+        void OnDestroy()
+        {
+            _levelService?.Dispose();
+            _shopMenuService?.Dispose();
+            _settingsMenuService?.Dispose();
+            _hudService?.Dispose();
+            _gameplayService?.Dispose();
+
+            _shopModel?.Dispose();
+            _levelWinModel?.Dispose();
+            _coinsModel?.Dispose();
+            _settingsModel?.Dispose();
+            _sessionModel?.Dispose();
+        }
+
+        void InitializeServices()
+        {
+            _sessionModel = new SessionModel();
+            _settingsModel = new SettingsModel();
+            _coinsModel = new CoinsModel();
+            _levelWinModel = new LevelWinModel();
+            _shopModel = new ShopModel(weaponShopCatalog);
+
+            var startingWeapon = ResolveStartingWeaponPrefab();
+
+            _gameplayService = new GameplayService(
+                config,
+                _sessionModel,
+                _settingsModel,
+                inputView,
+                cameraLookView,
+                weaponView,
+                crosshairView,
+                shootCamera,
+                projectilesRoot,
+                startingWeapon);
+
+            _hudService = new HudService(
+                _sessionModel,
+                _coinsModel,
+                config,
+                sessionHudView,
+                coinsHudView);
+
+            _settingsMenuService = new SettingsMenuService(
+                _settingsModel,
+                _levelWinModel,
+                settingsView,
+                inputView,
+                musicSource,
+                sfxSource,
+                () => _shopModel.IsOpen.Value);
+
+            _shopMenuService = new ShopMenuService(
+                _shopModel,
+                _coinsModel,
+                _settingsModel,
+                _levelWinModel,
+                shopView,
+                inputView,
+                EquipWeaponById);
+
+            _levelService = new LevelService(
+                _sessionModel,
+                _coinsModel,
+                _settingsModel,
+                _levelWinModel,
+                config,
+                targetsRoot,
+                shootCamera);
+            _levelService.BindWinUi(levelWinView, inputView);
+            _levelService.SetPlaylist(config.Levels);
+            _levelService.TryStartFirst();
+        }
+
+        GameObject ResolveStartingWeaponPrefab()
+        {
+            var equipped = _shopModel?.GetEquippedEntry();
+            if (equipped?.Prefab != null)
+                return equipped.Prefab;
+            return weaponPrefab;
+        }
+
+        void EquipWeaponById(string weaponId)
+        {
+            var entry = _shopModel?.FindById(weaponId);
+            if (entry?.Prefab == null || _gameplayService == null)
+                return;
+
+            _gameplayService.EquipWeaponPrefab(entry.Prefab);
+            weaponPrefab = entry.Prefab;
+        }
+
+        void ResolveSceneDependencies()
+        {
+            if (shootCamera == null)
+                shootCamera = Camera.main;
+
+            if (weaponShopCatalog == null)
+                weaponShopCatalog = Resources.Load<WeaponShopCatalog>("WeaponShopCatalog");
+
+            if (inputView == null)
+                inputView = FindAnyObjectByType<InputView>();
+
+            if (cameraLookView == null)
+                cameraLookView = FindAnyObjectByType<CameraLookView>();
+
+            if (weaponView == null)
+                weaponView = FindAnyObjectByType<WeaponView>();
+
+            if (crosshairView == null)
+                crosshairView = FindAnyObjectByType<CrosshairView>();
+
+            if (sessionHudView == null)
+                sessionHudView = FindAnyObjectByType<SessionHudView>();
+
+            if (coinsHudView == null)
+                coinsHudView = FindAnyObjectByType<CoinsHudView>();
+
+            if (settingsView == null)
+                settingsView = FindAnyObjectByType<SettingsView>();
+
+            if (shopView == null)
+                shopView = FindAnyObjectByType<ShopView>();
+
+            if (levelWinView == null)
+                levelWinView = FindAnyObjectByType<LevelWinView>();
+
+            if (projectilesRoot == null)
+                projectilesRoot = new GameObject("Projectiles").transform;
+
+            if (targetsRoot == null)
+                targetsRoot = new GameObject("LevelTargets").transform;
+
+            if (weaponShopCatalog == null)
+                Debug.LogError("Bootstrap: WeaponShopCatalog is missing. Place it at Resources/WeaponShopCatalog or assign on Bootstrap.");
+
+            if (shopView == null)
+                Debug.LogError("Bootstrap: ShopView is missing. Run Aim → Rebuild Shop UI.");
+
+            EnsureAudioSources();
+        }
+
+        void EnsureAudioSources()
+        {
+            if (musicSource != null && sfxSource != null)
+                return;
+
+            var audioRoot = GameObject.Find("GameAudio") ?? new GameObject("GameAudio");
+            if (musicSource == null)
+            {
+                musicSource = audioRoot.GetComponent<AudioSource>();
+                if (musicSource == null)
+                    musicSource = audioRoot.AddComponent<AudioSource>();
+                musicSource.loop = true;
+                musicSource.playOnAwake = false;
+                musicSource.spatialBlend = 0f;
+            }
+
+            if (sfxSource == null)
+            {
+                var sfxGo = audioRoot.transform.Find("SfxSource");
+                if (sfxGo == null)
+                {
+                    var created = new GameObject("SfxSource");
+                    created.transform.SetParent(audioRoot.transform, false);
+                    sfxSource = created.AddComponent<AudioSource>();
+                }
+                else
+                {
+                    sfxSource = sfxGo.GetComponent<AudioSource>() ?? sfxGo.gameObject.AddComponent<AudioSource>();
+                }
+
+                sfxSource.playOnAwake = false;
+                sfxSource.spatialBlend = 0f;
+            }
+        }
+    }
+}

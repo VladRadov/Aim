@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6478890a1b2c3d4e5f702, type: 3}
+  m_Name: Level_ShootingGallery
+  m_EditorClassIdentifier: 
+  displayName: Shooting Gallery
+  requiredHits: 12
+  ammo: 45
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 1.1, z: 8}
+  spawnSize: {x: 6, y: 1.5, z: 0}
+  minSpawnDistance: 1.2
+  targetPrefabs:
+  - {fileID: 1256750986954714659, guid: a5b9c95f4fc85b74893dcbfc9753edec, type: 3}
+  columns: 5
+  rows: 2
+  spacing: {x: 1.4, y: 1.2}
+  facingYaw: 180
+  retargetDelay: 0.35
+  normalColor: {r: 0.75, g: 0.75, b: 0.78, a: 1}
+  highlightColor: {r: 1, g: 0.82, b: 0.12, a: 1}
