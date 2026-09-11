@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f11c7103a2b3c4d5e6f708192a3b4c5d, type: 3}
+  m_Name: Level_PeekHold
+  m_EditorClassIdentifier: 
+  displayName: Долгий выглядыш
+  requiredHits: 10
+  ammo: 100
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 1.2, z: 9}
+  spawnSize: {x: 7, y: 2, z: 0.5}
+  minSpawnDistance: 1.8
+  peekPrefab: {fileID: 8658091891891648809, guid: f11c7106a2b3c4d5e6f708192a3b4c5d, type: 3}
+  coverCount: 3
+  coverSpacing: 2.8
+  coverSize: {x: 1.1, y: 2.2, z: 0.4}
+  peekSideOffset: 1.35
+  hideDepth: 0.7
+  targetHeight: 1.25
+  peekDurationMin: 1.1
+  peekDurationMax: 2.2
+  hideDurationMin: 1.4
+  hideDurationMax: 2.8
+  moveDuration: 0.25

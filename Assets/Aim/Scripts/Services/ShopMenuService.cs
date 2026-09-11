@@ -1,5 +1,4 @@
 using System;
-using Aim.Config;
 using Aim.Models;
 using Aim.Presenters;
 using Aim.Views;
@@ -18,7 +17,8 @@ namespace Aim.Services
             LevelWinModel levelWinModel,
             ShopView shopView,
             InputView inputView,
-            Action<string> onEquipWeapon)
+            Action<string> onEquipWeapon,
+            Func<bool> isOtherUiOpen = null)
         {
             if (shopView == null)
             {
@@ -32,7 +32,9 @@ namespace Aim.Services
                 shopView,
                 inputView,
                 onEquipWeapon,
-                () => settingsModel.IsOpen.Value || levelWinModel.IsOpen.Value);
+                () => settingsModel.IsOpen.Value ||
+                      levelWinModel.IsOpen.Value ||
+                      (isOtherUiOpen?.Invoke() ?? false));
             _shopPresenter.Initialize();
         }
 

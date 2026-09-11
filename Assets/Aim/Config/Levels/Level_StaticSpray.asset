@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b9c0d1e2f35dd567f801234567890a, type: 3}
+  m_Name: Level_StaticSpray
+  m_EditorClassIdentifier: 
+  displayName: Град мишеней
+  requiredHits: 18
+  ammo: 100
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 2.3, z: 8}
+  spawnSize: {x: 10, y: 4, z: 0.5}
+  minSpawnDistance: 1.0
+  staticPrefab: {fileID: 8658091891891648808, guid: 8388fa3d239a68e42a2a563bd63b1f98, type: 3}
+  spawnInterval: 0.35
+  maxAlive: 10
+  lifeTime: 3.2

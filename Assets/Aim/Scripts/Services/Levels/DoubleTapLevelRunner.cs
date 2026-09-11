@@ -11,14 +11,16 @@ namespace Aim.Services.Levels
     public sealed class DoubleTapLevelRunner : ILevelRunner
     {
         readonly MultiHitTargetPool _pool;
+        readonly Camera _aimCamera;
         readonly List<MultiHitTargetView> _active = new();
         SpawnOccupancyTracker _occupancy;
         CancellationTokenSource _cts;
         int _alive;
 
-        public DoubleTapLevelRunner(MultiHitTargetPool pool)
+        public DoubleTapLevelRunner(MultiHitTargetPool pool, Camera aimCamera)
         {
             _pool = pool;
+            _aimCamera = aimCamera;
         }
 
         public void Start(LevelDefinition definition)
@@ -97,6 +99,7 @@ namespace Aim.Services.Levels
                 spawnPoint,
                 definition.HitPoints,
                 definition.LifeTime,
+                _aimCamera,
                 despawned =>
                 {
                     _active.Remove(despawned);

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f11c7103a2b3c4d5e6f708192a3b4c5d, type: 3}
+  m_Name: Level_PeekRush
+  m_EditorClassIdentifier: 
+  displayName: Быстрый выглядыш
+  requiredHits: 16
+  ammo: 100
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 1.2, z: 8}
+  spawnSize: {x: 10, y: 2, z: 0.5}
+  minSpawnDistance: 1.3
+  peekPrefab: {fileID: 8658091891891648809, guid: f11c7106a2b3c4d5e6f708192a3b4c5d, type: 3}
+  coverCount: 6
+  coverSpacing: 1.7
+  coverSize: {x: 0.75, y: 1.8, z: 0.3}
+  peekSideOffset: 0.95
+  hideDepth: 0.45
+  targetHeight: 1.05
+  peekDurationMin: 0.35
+  peekDurationMax: 0.8
+  hideDurationMin: 0.4
+  hideDurationMax: 1.1
+  moveDuration: 0.12

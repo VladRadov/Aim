@@ -16,20 +16,31 @@ namespace Aim.Services
         readonly CoinsModel _coins;
         readonly SettingsModel _settings;
         readonly LevelWinModel _winModel;
+        readonly MainMenuModel _mainMenuModel;
+        readonly LevelRunStatsTracker _statsTracker;
+        readonly CampaignProgressStore _campaignProgress = new();
         readonly AimTrainerConfig _config;
         readonly LevelController _controller;
+        readonly List<LevelDefinition> _campaignPlaylist = new();
         readonly List<LevelDefinition> _playlist = new();
         readonly CompositeDisposable _disposables = new();
 
         LevelWinPresenter _winPresenter;
+        LevelTipPresenter _tipPresenter;
         int _index = -1;
+        bool _isCampaign;
+        int? _hitsOverride;
+        int? _ammoOverride;
 
         public LevelController Controller => _controller;
         public LevelDefinition ActiveLevel => _controller.ActiveDefinition;
         public IReadOnlyList<LevelDefinition> Playlist => _playlist;
         public int CurrentIndex => _index;
+        public bool IsCampaign => _isCampaign;
+        public CampaignProgressStore CampaignProgress => _campaignProgress;
 
         public bool HasNext =>
+            _isCampaign &&
             _playlist.Count > 0 &&
             _index >= 0 &&
             _index + 1 < _playlist.Count &&
@@ -40,6 +51,8 @@ namespace Aim.Services
             CoinsModel coins,
             SettingsModel settings,
             LevelWinModel winModel,
+            MainMenuModel mainMenuModel,
+            LevelRunStatsTracker statsTracker,
             AimTrainerConfig config,
             Transform targetsRoot,
             Camera aimCamera)
@@ -48,6 +61,8 @@ namespace Aim.Services
             _coins = coins ?? throw new ArgumentNullException(nameof(coins));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _winModel = winModel ?? throw new ArgumentNullException(nameof(winModel));
+            _mainMenuModel = mainMenuModel ?? throw new ArgumentNullException(nameof(mainMenuModel));
+            _statsTracker = statsTracker ?? throw new ArgumentNullException(nameof(statsTracker));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _controller = new LevelController(
                 session,
@@ -58,7 +73,17 @@ namespace Aim.Services
 
             _session.State
                 .Where(state => state == LevelState.Won || state == LevelState.Lost)
-                .Subscribe(_ => _controller.StopLevel(resetSession: false))
+                .Subscribe(state =>
+                {
+                    if (state == LevelState.Won && _isCampaign && _index >= 0)
+                    {
+                        var nextIndex = HasNext ? _index + 1 : _index;
+                        _campaignProgress.SetIndex(nextIndex);
+                    }
+
+                    _tipPresenter?.Hide();
+                    _controller.StopLevel(resetSession: false);
+                })
                 .AddTo(_disposables);
         }
 
@@ -78,64 +103,78 @@ namespace Aim.Services
                 _session,
                 _coins,
                 _settings,
+                _mainMenuModel,
                 this,
+                _statsTracker,
                 _config,
                 view,
                 inputView);
             _winPresenter.Initialize();
         }
 
-        public void SetPlaylist(IEnumerable<LevelDefinition> levels)
+        public void BindTipUi(LevelTipView view)
         {
-            _playlist.Clear();
-            _index = -1;
+            _tipPresenter?.Dispose();
+            _tipPresenter = null;
+
+            if (view == null)
+            {
+                Debug.LogWarning("LevelService: LevelTipView is not assigned. Run Aim/Rebuild Level Tip UI.");
+                return;
+            }
+
+            _tipPresenter = new LevelTipPresenter(view);
+        }
+
+        public void SetCampaignPlaylist(IEnumerable<LevelDefinition> levels)
+        {
+            _campaignPlaylist.Clear();
             if (levels == null)
                 return;
 
             foreach (var level in levels)
             {
                 if (level != null)
-                    _playlist.Add(level);
+                    _campaignPlaylist.Add(level);
             }
         }
 
-        public void Enqueue(LevelDefinition level)
+        public void SetPlaylist(IEnumerable<LevelDefinition> levels)
         {
-            if (level != null)
-                _playlist.Add(level);
+            SetCampaignPlaylist(levels);
         }
 
-        public void EnqueueRange(IEnumerable<LevelDefinition> levels)
+        public bool TryStartCampaign()
         {
-            if (levels == null)
-                return;
-
-            foreach (var level in levels)
-                Enqueue(level);
-        }
-
-        public void InsertNext(LevelDefinition level)
-        {
-            if (level == null)
-                return;
-
-            var insertAt = Mathf.Clamp(_index + 1, 0, _playlist.Count);
-            _playlist.Insert(insertAt, level);
-        }
-
-        public void ClearPlaylist()
-        {
-            _playlist.Clear();
-            _index = -1;
-        }
-
-        public bool TryStartFirst()
-        {
-            if (_playlist.Count == 0)
+            if (_campaignPlaylist.Count == 0)
                 return false;
 
+            _isCampaign = true;
+            ClearOverrides();
+            _playlist.Clear();
+            _playlist.AddRange(_campaignPlaylist);
+
+            var index = Mathf.Clamp(_campaignProgress.GetIndex(), 0, _playlist.Count - 1);
+            _index = index;
+            _campaignProgress.SetIndex(_index);
+            _mainMenuModel.Close();
+            StartLevelInternal(_playlist[_index]);
+            return true;
+        }
+
+        public bool TryStartCustom(LevelDefinition definition, int requiredHits, int ammo)
+        {
+            if (definition == null)
+                return false;
+
+            _isCampaign = false;
+            _playlist.Clear();
+            _playlist.Add(definition);
             _index = 0;
-            _controller.StartLevel(_playlist[0]);
+            _hitsOverride = Mathf.Max(1, requiredHits);
+            _ammoOverride = definition.AllowsShooting ? Mathf.Max(0, ammo) : 0;
+            _mainMenuModel.Close();
+            StartLevelInternal(definition);
             return true;
         }
 
@@ -145,28 +184,49 @@ namespace Aim.Services
                 return false;
 
             _index++;
-            _controller.StartLevel(_playlist[_index]);
+            _campaignProgress.SetIndex(_index);
+            StartLevelInternal(_playlist[_index]);
             return true;
         }
 
-        public void StartLevel(LevelDefinition definition)
+        public bool TryRestartCurrent()
         {
-            if (definition == null)
-                return;
+            if (_index < 0 || _index >= _playlist.Count || _playlist[_index] == null)
+                return false;
 
-            var playlistIndex = _playlist.IndexOf(definition);
-            _index = playlistIndex;
-            if (playlistIndex < 0)
-            {
-                _playlist.Add(definition);
-                _index = _playlist.Count - 1;
-            }
+            StartLevelInternal(_playlist[_index]);
+            return true;
+        }
 
-            _controller.StartLevel(definition);
+        public void ReturnToMenu()
+        {
+            _winModel.Close();
+            _tipPresenter?.Hide();
+            _controller.StopLevel(resetSession: true);
+            ClearOverrides();
+            _isCampaign = false;
+            _index = -1;
+            _playlist.Clear();
+            _mainMenuModel.ShowRoot();
+        }
+
+        void StartLevelInternal(LevelDefinition definition)
+        {
+            _tipPresenter?.Hide();
+            _statsTracker.Begin(definition);
+            _controller.StartLevel(definition, _hitsOverride, _ammoOverride);
+            _tipPresenter?.ShowForLevel(definition);
+        }
+
+        void ClearOverrides()
+        {
+            _hitsOverride = null;
+            _ammoOverride = null;
         }
 
         public void Stop()
         {
+            _tipPresenter?.Hide();
             _controller.StopLevel(resetSession: true);
         }
 
@@ -174,6 +234,8 @@ namespace Aim.Services
         {
             _winPresenter?.Dispose();
             _winPresenter = null;
+            _tipPresenter?.Dispose();
+            _tipPresenter = null;
             _disposables.Dispose();
             _controller.Dispose();
         }

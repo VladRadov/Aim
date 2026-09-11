@@ -12,19 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11c7501a2b3c4d5e6f708192a3b4c5d, type: 3}
   m_Name: Level_PrecisionCircles
   m_EditorClassIdentifier: 
-  displayName: Precision Circles
+  displayName: Точные круги
   requiredHits: 10
-  ammo: 16
+  ammo: 100
   allowsShooting: 1
   autoStart: 1
   spawnCenter: {x: 0, y: 2, z: 0}
   spawnSize: {x: 7, y: 3, z: 0}
   minSpawnDistance: 1.2
   circlePrefab: {fileID: 8658091891891648808, guid: 8388fa3d239a68e42a2a563bd63b1f98, type: 3}
-  spawnInterval: 0.9
+  spawnInterval: 0.4
   maxAlive: 5
   lifeTime: 5
-  scaleMin: 0.35
-  scaleMax: 0.7
+  scaleMin: 0.75
+  scaleMax: 0.75
   nearDistance: 6
   farDistance: 14

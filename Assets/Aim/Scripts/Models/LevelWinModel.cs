@@ -6,19 +6,22 @@ namespace Aim.Models
     public sealed class LevelWinModel : IDisposable
     {
         readonly ReactiveProperty<bool> _isOpen = new(false);
-        readonly ReactiveProperty<int> _awardedWinBonus = new(0);
+        readonly ReactiveProperty<LevelRunSummary> _summary = new(default);
         readonly ReactiveProperty<bool> _hasNextLevel = new(false);
         readonly ReactiveProperty<bool> _rewardClaimed = new(false);
+        readonly ReactiveProperty<bool> _showReward = new(false);
 
         public IReadOnlyReactiveProperty<bool> IsOpen => _isOpen;
-        public IReadOnlyReactiveProperty<int> AwardedWinBonus => _awardedWinBonus;
+        public IReadOnlyReactiveProperty<LevelRunSummary> Summary => _summary;
         public IReadOnlyReactiveProperty<bool> HasNextLevel => _hasNextLevel;
         public IReadOnlyReactiveProperty<bool> RewardClaimed => _rewardClaimed;
+        public IReadOnlyReactiveProperty<bool> ShowReward => _showReward;
 
-        public void Open(int winBonus, bool hasNextLevel)
+        public void Open(LevelRunSummary summary, bool hasNextLevel, bool showReward)
         {
-            _awardedWinBonus.Value = System.Math.Max(0, winBonus);
+            _summary.Value = summary;
             _hasNextLevel.Value = hasNextLevel;
+            _showReward.Value = showReward && summary.IsWin;
             _rewardClaimed.Value = false;
             _isOpen.Value = true;
         }
@@ -30,9 +33,10 @@ namespace Aim.Models
         public void Dispose()
         {
             _isOpen.Dispose();
-            _awardedWinBonus.Dispose();
+            _summary.Dispose();
             _hasNextLevel.Dispose();
             _rewardClaimed.Dispose();
+            _showReward.Dispose();
         }
     }
 }

@@ -94,10 +94,7 @@ namespace Aim.Services.Levels
                 center.y + UnityEngine.Random.Range(-halfY, halfY),
                 z);
 
-            var scale = UnityEngine.Random.Range(definition.ScaleMin, definition.ScaleMax);
-            // Farther targets are a bit smaller.
-            var distanceFactor = Mathf.InverseLerp(definition.NearDistance, definition.FarDistance, z);
-            scale *= Mathf.Lerp(1f, 0.75f, distanceFactor);
+            var scale = definition.ScaleMax;
 
             var target = _pool.Rent();
             _alive++;

@@ -54,21 +54,21 @@ namespace Aim.Editor
             var priority = EnsurePriorityPrefab();
             var multiHit = EnsureMultiHitPrefab();
 
-            EnsureFlyingLevelAsset(FlyingLevelPath, "Flying Balls", flying, 10, 15);
-            EnsureBouncingLevelAsset(BouncingLevelPath, "Bouncing Balls", bouncing, 12, 18);
-            EnsureTrackingLevelAsset(TrackingLevelPath, "Tracking Ball", tracking, 8);
-            EnsureTrackingMoversLevelAsset(TrackingMoversLevelPath, "Tracking Movers", movers, 12);
-            EnsureStaticLevelAsset(StaticLevelPath, "Static Balls", flying, 12, 18);
-            EnsureFlickLevelAsset(FlickLevelPath, "Flick Targets", flying, 15, 25);
-            EnsurePeekLevelAsset(PeekLevelPath, "Peek Cover", peek, 12, 30);
-            EnsureRailsLevelAsset(RailsLevelPath, "Moving Rails", flying, 12, 22);
-            EnsurePopupLevelAsset(PopupLevelPath, "Pop-up Ducks", peek, 10, 24);
-            EnsurePriorityLevelAsset(PriorityLevelPath, "Priority Targets", priority, 12, 28);
-            EnsurePrecisionLevelAsset(PrecisionLevelPath, "Precision Circles", flying, 10, 16);
-            EnsureDoubleTapLevelAsset(DoubleTapLevelPath, "Double Tap", multiHit, 8, 30);
-            EnsureCharacterLevelAsset(CharacterLevelPath, "Headshots", character, 8, 12);
-            EnsureCustomLevelAsset(CustomLevelPath, "Custom Zones", custom, 10, 14);
-            EnsureGalleryLevelAsset(GalleryLevelPath, "Shooting Gallery", gallery, 12, 18);
+            EnsureFlyingLevelAsset(FlyingLevelPath, "Летучие мишени", flying, 10, 15);
+            EnsureBouncingLevelAsset(BouncingLevelPath, "Скакуны", bouncing, 12, 18);
+            EnsureTrackingLevelAsset(TrackingLevelPath, "Ведение цели", tracking, 8);
+            EnsureTrackingMoversLevelAsset(TrackingMoversLevelPath, "Слежка за роем", movers, 12);
+            EnsureStaticLevelAsset(StaticLevelPath, "Стоячие шары", flying, 12, 18);
+            EnsureFlickLevelAsset(FlickLevelPath, "Быстрый флик", flying, 15, 25);
+            EnsurePeekLevelAsset(PeekLevelPath, "Из-за укрытия", peek, 12, 30);
+            EnsureRailsLevelAsset(RailsLevelPath, "Рельсовый тир", flying, 12, 22);
+            EnsurePopupLevelAsset(PopupLevelPath, "Всплывающие мишени", peek, 10, 24);
+            EnsurePriorityLevelAsset(PriorityLevelPath, "Главная цель", priority, 12, 28);
+            EnsurePrecisionLevelAsset(PrecisionLevelPath, "Точные круги", flying, 10, 16);
+            EnsureDoubleTapLevelAsset(DoubleTapLevelPath, "Двойной удар", multiHit, 8, 30);
+            EnsureCharacterLevelAsset(CharacterLevelPath, "В яблочко", character, 8, 12);
+            EnsureCustomLevelAsset(CustomLevelPath, "Золотая точка", custom, 10, 14);
+            EnsureGalleryLevelAsset(GalleryLevelPath, "Тир с банками", gallery, 12, 18);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6478890a1b2c3d4e5f603, type: 3}
   m_Name: Level_CustomHitZones
   m_EditorClassIdentifier: 
-  displayName: Custom Zones
+  displayName: Золотая точка
   requiredHits: 10
-  ammo: 34
+  ammo: 100
   allowsShooting: 1
   autoStart: 1
   spawnCenter: {x: 0, y: 2, z: 7.7}

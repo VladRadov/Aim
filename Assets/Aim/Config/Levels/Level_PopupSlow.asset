@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f11c7301a2b3c4d5e6f708192a3b4c5d, type: 3}
+  m_Name: Level_PopupSlow
+  m_EditorClassIdentifier: 
+  displayName: Медленный подъём
+  requiredHits: 8
+  ammo: 100
+  allowsShooting: 1
+  autoStart: 1
+  spawnCenter: {x: 0, y: 0.2, z: 8.5}
+  spawnSize: {x: 7, y: 1, z: 1.5}
+  minSpawnDistance: 1.5
+  duckPrefab: {fileID: 8658091891891648809, guid: f11c7106a2b3c4d5e6f708192a3b4c5d, type: 3}
+  columns: 4
+  rows: 2
+  spacing: {x: 1.9, y: 1.5}
+  upHeight: 1.25
+  downOffset: 1.3
+  upDurationMin: 1.4
+  upDurationMax: 2.4
+  downDurationMin: 1.2
+  downDurationMax: 2.6
+  moveDuration: 0.3

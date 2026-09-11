@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9f5a2b30c8e5f7a9b1d2e3f4a5b6c7d, type: 3}
   m_Name: Level_TrackingBall
   m_EditorClassIdentifier: 
-  displayName: Tracking Ball
+  displayName: Ведение цели
   requiredHits: 8
   ammo: 0
   allowsShooting: 0

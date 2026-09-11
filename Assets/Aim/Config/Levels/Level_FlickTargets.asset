@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11c7001a2b3c4d5e6f708192a3b4c5d, type: 3}
   m_Name: Level_FlickTargets
   m_EditorClassIdentifier: 
-  displayName: Flick Targets
+  displayName: Быстрый флик
   requiredHits: 15
-  ammo: 25
+  ammo: 100
   allowsShooting: 1
   autoStart: 1
   spawnCenter: {x: 0, y: 2, z: 8}

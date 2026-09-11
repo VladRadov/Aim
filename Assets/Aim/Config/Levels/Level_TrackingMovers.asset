@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22b3c4d5e6f7489901a2b3c4d5e6f012, type: 3}
   m_Name: Level_TrackingMovers
   m_EditorClassIdentifier: 
-  displayName: Tracking Movers
+  displayName: Слежка за роем
   requiredHits: 12
   ammo: 0
   allowsShooting: 0

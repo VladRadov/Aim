@@ -41,7 +41,7 @@ namespace Aim.Controllers
             _targetMask = targetMask;
         }
 
-        public void StartLevel(LevelDefinition definition)
+        public void StartLevel(LevelDefinition definition, int? requiredHitsOverride = null, int? ammoOverride = null)
         {
             if (definition == null)
                 throw new ArgumentNullException(nameof(definition));
@@ -50,7 +50,9 @@ namespace Aim.Controllers
             EnsurePools(definition);
 
             ActiveDefinition = definition;
-            _session.Start(definition.RequiredHits, definition.Ammo, definition.AllowsShooting);
+            var requiredHits = requiredHitsOverride ?? definition.RequiredHits;
+            var ammo = ammoOverride ?? definition.Ammo;
+            _session.Start(requiredHits, ammo, definition.AllowsShooting);
             _activeRunner = CreateRunner(definition.LevelType);
             _activeRunner.Start(definition);
         }
@@ -186,7 +188,7 @@ namespace Aim.Controllers
                 LevelType.PopupDucks => new PopupDucksLevelRunner(_peekPool, _targetsRoot),
                 LevelType.PriorityTargets => new PriorityTargetsLevelRunner(_priorityPool),
                 LevelType.PrecisionCircles => new PrecisionCirclesLevelRunner(_flyingPool),
-                LevelType.DoubleTap => new DoubleTapLevelRunner(_multiHitPool),
+                LevelType.DoubleTap => new DoubleTapLevelRunner(_multiHitPool, _aimCamera),
                 _ => new FlyingObjectsLevelRunner(_flyingPool)
             };
         }

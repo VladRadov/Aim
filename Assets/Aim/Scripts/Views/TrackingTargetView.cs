@@ -38,6 +38,11 @@ namespace Aim.Views
         float _maxHealth;
         float _health;
         float _bounceSpeed;
+        float _minX;
+        float _maxX;
+        float _minY;
+        float _maxY;
+        bool _hasBounds;
         bool _isActive;
         bool _isTracked;
 
@@ -70,6 +75,18 @@ namespace Aim.Views
             Camera billboardCamera,
             Action<TrackingTargetView> onDespawn)
         {
+            Activate(position, velocity, maxHealth, bounciness, billboardCamera, null, onDespawn);
+        }
+
+        public void Activate(
+            Vector3 position,
+            Vector3 velocity,
+            float maxHealth,
+            float bounciness,
+            Camera billboardCamera,
+            Bounds? moveBounds,
+            Action<TrackingTargetView> onDespawn)
+        {
             EnsurePhysics();
             EnsureHealthBar();
 
@@ -80,6 +97,21 @@ namespace Aim.Views
             _bounceSpeed = Mathf.Max(0.5f, Mathf.Abs(velocity.y));
             _isActive = true;
             _isTracked = false;
+
+            if (moveBounds.HasValue)
+            {
+                var bounds = moveBounds.Value;
+                var radius = GetRadius();
+                _minX = bounds.min.x + radius;
+                _maxX = bounds.max.x - radius;
+                _minY = bounds.min.y + radius;
+                _maxY = bounds.max.y - radius;
+                _hasBounds = _maxX > _minX && _maxY > _minY;
+            }
+            else
+            {
+                _hasBounds = false;
+            }
 
             gameObject.SetActive(true);
 
@@ -142,6 +174,7 @@ namespace Aim.Views
             _onDespawn = null;
             _health = 0f;
             _bounceSpeed = 0f;
+            _hasBounds = false;
             ApplyColor(normalColor);
             UpdateHealthBar();
 
@@ -152,6 +185,14 @@ namespace Aim.Views
                 body.isKinematic = true;
                 body.useGravity = false;
             }
+        }
+
+        void FixedUpdate()
+        {
+            if (!_isActive || body == null || !_hasBounds)
+                return;
+
+            KeepInsideBounds();
         }
 
         void LateUpdate()
@@ -168,16 +209,27 @@ namespace Aim.Views
             canvasTransform.rotation = Quaternion.LookRotation(canvasTransform.position - cam.transform.position, Vector3.up);
         }
 
-        void OnCollisionEnter(Collision collision) => SustainFloorBounce(collision);
+        void OnCollisionEnter(Collision collision) => HandleCollision(collision);
 
-        void OnCollisionStay(Collision collision) => SustainFloorBounce(collision);
+        void OnCollisionStay(Collision collision) => HandleCollision(collision);
 
-        void SustainFloorBounce(Collision collision)
+        void HandleCollision(Collision collision)
         {
-            if (!_isActive || body == null || _bounceSpeed <= 0f)
+            if (!_isActive || body == null)
                 return;
 
-            if (!HasFloorContact(collision))
+            if (HasFloorContact(collision))
+            {
+                SustainFloorBounce();
+                return;
+            }
+
+            ReflectFromWall(collision);
+        }
+
+        void SustainFloorBounce()
+        {
+            if (_bounceSpeed <= 0f)
                 return;
 
             var velocity = body.linearVelocity;
@@ -186,6 +238,81 @@ namespace Aim.Views
 
             velocity.y = _bounceSpeed;
             body.linearVelocity = velocity;
+        }
+
+        void ReflectFromWall(Collision collision)
+        {
+            var count = collision.contactCount;
+            for (var i = 0; i < count; i++)
+            {
+                var normal = collision.GetContact(i).normal;
+                if (Mathf.Abs(normal.x) < 0.5f)
+                    continue;
+
+                var velocity = body.linearVelocity;
+                if (Mathf.Sign(velocity.x) == Mathf.Sign(-normal.x) || Mathf.Abs(velocity.x) < 0.01f)
+                {
+                    var speed = Mathf.Max(Mathf.Abs(velocity.x), _bounceSpeed * 0.35f);
+                    velocity.x = Mathf.Sign(normal.x) * speed;
+                    body.linearVelocity = velocity;
+                }
+
+                return;
+            }
+        }
+
+        void KeepInsideBounds()
+        {
+            var position = body.position;
+            var velocity = body.linearVelocity;
+            var changed = false;
+
+            if (position.x < _minX)
+            {
+                position.x = _minX;
+                velocity.x = Mathf.Abs(velocity.x);
+                if (velocity.x < 0.5f)
+                    velocity.x = Mathf.Max(_bounceSpeed * 0.35f, 0.5f);
+                changed = true;
+            }
+            else if (position.x > _maxX)
+            {
+                position.x = _maxX;
+                velocity.x = -Mathf.Abs(velocity.x);
+                if (velocity.x > -0.5f)
+                    velocity.x = -Mathf.Max(_bounceSpeed * 0.35f, 0.5f);
+                changed = true;
+            }
+
+            if (position.y < _minY)
+            {
+                position.y = _minY;
+                velocity.y = Mathf.Max(Mathf.Abs(velocity.y), _bounceSpeed);
+                changed = true;
+            }
+            else if (position.y > _maxY)
+            {
+                position.y = _maxY;
+                velocity.y = -Mathf.Abs(velocity.y);
+                changed = true;
+            }
+
+            if (!changed)
+                return;
+
+            body.position = position;
+            body.linearVelocity = velocity;
+        }
+
+        float GetRadius()
+        {
+            if (_collider == null)
+                _collider = GetComponent<SphereCollider>();
+            if (_collider == null)
+                return 0.5f;
+
+            var scale = transform.lossyScale;
+            return _collider.radius * Mathf.Max(scale.x, Mathf.Max(scale.y, scale.z));
         }
 
         static bool HasFloorContact(Collision collision)

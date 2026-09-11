@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99fb4a1b54237d54788d5dfa53d459f9, type: 3}
   m_Name: Level_BouncingBalls
   m_EditorClassIdentifier: 
-  displayName: Bouncing Balls
+  displayName: Скакуны
   requiredHits: 12
-  ammo: 32
+  ammo: 100
   allowsShooting: 1
   autoStart: 1
   spawnCenter: {x: 0, y: 0.45, z: 8}

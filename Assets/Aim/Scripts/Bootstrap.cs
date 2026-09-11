@@ -1,5 +1,6 @@
 using Aim.Config;
 using Aim.Models;
+using Aim.Presenters;
 using Aim.Services;
 using Aim.Views;
 using UnityEngine;
@@ -26,6 +27,8 @@ namespace Aim
         [SerializeField] SettingsView settingsView;
         [SerializeField] ShopView shopView;
         [SerializeField] LevelWinView levelWinView;
+        [SerializeField] LevelTipView levelTipView;
+        [SerializeField] MainMenuView mainMenuView;
 
         [Header("World")]
         [SerializeField] Transform projectilesRoot;
@@ -37,6 +40,7 @@ namespace Aim
         SettingsModel _settingsModel;
         CoinsModel _coinsModel;
         LevelWinModel _levelWinModel;
+        MainMenuModel _mainMenuModel;
         ShopModel _shopModel;
 
         GameplayService _gameplayService;
@@ -44,6 +48,8 @@ namespace Aim
         SettingsMenuService _settingsMenuService;
         ShopMenuService _shopMenuService;
         LevelService _levelService;
+        MainMenuPresenter _mainMenuPresenter;
+        GameModeCatalog _modeCatalog;
 
         void Awake()
         {
@@ -53,6 +59,7 @@ namespace Aim
 
         void OnDestroy()
         {
+            _mainMenuPresenter?.Dispose();
             _levelService?.Dispose();
             _shopMenuService?.Dispose();
             _settingsMenuService?.Dispose();
@@ -60,6 +67,7 @@ namespace Aim
             _gameplayService?.Dispose();
 
             _shopModel?.Dispose();
+            _mainMenuModel?.Dispose();
             _levelWinModel?.Dispose();
             _coinsModel?.Dispose();
             _settingsModel?.Dispose();
@@ -72,6 +80,7 @@ namespace Aim
             _settingsModel = new SettingsModel();
             _coinsModel = new CoinsModel();
             _levelWinModel = new LevelWinModel();
+            _mainMenuModel = new MainMenuModel();
             _shopModel = new ShopModel(weaponShopCatalog);
 
             var startingWeapon = ResolveStartingWeaponPrefab();
@@ -102,7 +111,7 @@ namespace Aim
                 inputView,
                 musicSource,
                 sfxSource,
-                () => _shopModel.IsOpen.Value);
+                () => _shopModel.IsOpen.Value || _mainMenuModel.IsOpen.Value);
 
             _shopMenuService = new ShopMenuService(
                 _shopModel,
@@ -111,19 +120,53 @@ namespace Aim
                 _levelWinModel,
                 shopView,
                 inputView,
-                EquipWeaponById);
+                EquipWeaponById,
+                () => _mainMenuModel.IsOpen.Value);
+
+            var statsTracker = new LevelRunStatsTracker(
+                _gameplayService.ShootModel,
+                _sessionModel,
+                _coinsModel);
 
             _levelService = new LevelService(
                 _sessionModel,
                 _coinsModel,
                 _settingsModel,
                 _levelWinModel,
+                _mainMenuModel,
+                statsTracker,
                 config,
                 targetsRoot,
                 shootCamera);
             _levelService.BindWinUi(levelWinView, inputView);
-            _levelService.SetPlaylist(config.Levels);
-            _levelService.TryStartFirst();
+            _levelService.BindTipUi(levelTipView);
+            _levelService.SetCampaignPlaylist(config.Levels);
+
+            _modeCatalog = new GameModeCatalog(config.Levels);
+
+            if (mainMenuView != null)
+            {
+                _mainMenuPresenter = new MainMenuPresenter(
+                    _mainMenuModel,
+                    _levelService,
+                    _modeCatalog,
+                    _settingsModel,
+                    _levelWinModel,
+                    mainMenuView,
+                    inputView);
+                _mainMenuPresenter.Initialize();
+            }
+            else
+            {
+                Debug.LogError("Bootstrap: MainMenuView is missing. Run Aim → Rebuild Main Menu UI.");
+            }
+        }
+
+        void Start()
+        {
+            _mainMenuModel?.ShowRoot();
+            if (inputView != null)
+                inputView.SetUiCapture(true);
         }
 
         GameObject ResolveStartingWeaponPrefab()
@@ -178,6 +221,12 @@ namespace Aim
 
             if (levelWinView == null)
                 levelWinView = FindAnyObjectByType<LevelWinView>();
+
+            if (levelTipView == null)
+                levelTipView = FindAnyObjectByType<LevelTipView>();
+
+            if (mainMenuView == null)
+                mainMenuView = FindAnyObjectByType<MainMenuView>();
 
             if (projectilesRoot == null)
                 projectilesRoot = new GameObject("Projectiles").transform;

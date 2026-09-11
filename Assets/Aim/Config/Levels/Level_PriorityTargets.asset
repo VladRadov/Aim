@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11c7403a2b3c4d5e6f708192a3b4c5d, type: 3}
   m_Name: Level_PriorityTargets
   m_EditorClassIdentifier: 
-  displayName: Priority Targets
+  displayName: Главная цель
   requiredHits: 12
-  ammo: 28
+  ammo: 100
   allowsShooting: 1
   autoStart: 1
   spawnCenter: {x: 0, y: 2, z: 8}

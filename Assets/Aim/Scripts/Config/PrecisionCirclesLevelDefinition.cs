@@ -9,11 +9,11 @@ namespace Aim.Config
     {
         [Header("Precision Circles")]
         [SerializeField] FlyingTargetView circlePrefab;
-        [SerializeField] float spawnInterval = 0.9f;
+        [SerializeField] float spawnInterval = 0.4f;
         [SerializeField] int maxAlive = 5;
         [SerializeField] float lifeTime = 5f;
-        [SerializeField] float scaleMin = 0.35f;
-        [SerializeField] float scaleMax = 0.7f;
+        [SerializeField] float scaleMin = 0.75f;
+        [SerializeField] float scaleMax = 0.75f;
         [SerializeField] float nearDistance = 6f;
         [SerializeField] float farDistance = 14f;
 

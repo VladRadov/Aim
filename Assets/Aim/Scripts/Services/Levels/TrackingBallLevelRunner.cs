@@ -32,6 +32,7 @@ namespace Aim.Services.Levels
         CancellationTokenSource _cts;
         TrackingTargetView _active;
         TrackingBallLevelDefinition _definition;
+        Bounds _playBounds;
         Vector3? _lastSpawnPoint;
         bool _respawning;
 
@@ -208,6 +209,7 @@ namespace Aim.Services.Levels
                 _definition.MaxHealth,
                 _definition.Bounciness,
                 _aimCamera,
+                _playBounds,
                 OnDespawn);
         }
 
@@ -248,23 +250,35 @@ namespace Aim.Services.Levels
             var size = definition.SpawnSize;
             var half = size * 0.5f;
             var floorY = center.y - 0.1f;
-            var wallHeight = Mathf.Max(3f, size.y + 2.5f);
-            var wallThickness = 0.25f;
+            // Tall enough that high bounces cannot clear the side walls.
+            var wallHeight = Mathf.Max(10f, size.y + definition.MaxUpwardSpeed * 0.85f + 3f);
+            var wallThickness = 0.4f;
+            var depth = Mathf.Max(4f, size.z + 2f);
+            var width = Mathf.Max(4f, size.x);
+
+            _playBounds = new Bounds(
+                new Vector3(center.x, floorY + wallHeight * 0.5f, center.z),
+                new Vector3(width, wallHeight, depth));
 
             CreateArenaBox(
                 "TrackFloor",
                 new Vector3(center.x, floorY, center.z),
-                new Vector3(Mathf.Max(4f, size.x + 2f), 0.2f, 3f));
+                new Vector3(width + wallThickness * 2f, 0.2f, depth));
+
+            CreateArenaBox(
+                "TrackCeiling",
+                new Vector3(center.x, floorY + wallHeight, center.z),
+                new Vector3(width + wallThickness * 2f, 0.2f, depth));
 
             CreateArenaBox(
                 "TrackWallLeft",
                 new Vector3(center.x - half.x - wallThickness * 0.5f, floorY + wallHeight * 0.5f, center.z),
-                new Vector3(wallThickness, wallHeight, 3f));
+                new Vector3(wallThickness, wallHeight, depth));
 
             CreateArenaBox(
                 "TrackWallRight",
                 new Vector3(center.x + half.x + wallThickness * 0.5f, floorY + wallHeight * 0.5f, center.z),
-                new Vector3(wallThickness, wallHeight, 3f));
+                new Vector3(wallThickness, wallHeight, depth));
         }
 
         void CreateArenaBox(string name, Vector3 position, Vector3 size)
