@@ -641,8 +641,8 @@ namespace Aim.Editor
             accentImage.type = Image.Type.Sliced;
             accentImage.color = Accent;
 
-            CreateLabel(headerGo.transform, "Title", "SHOP", new Vector2(0f, -22f), 32, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
-            CreateLabel(headerGo.transform, "Section", "WEAPONS", new Vector2(0f, -48f), 16, FontStyle.Normal, TextAnchor.MiddleCenter, SoftText);
+            CreateLabel(headerGo.transform, "Title", "МАГАЗИН", new Vector2(0f, -22f), 32, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
+            CreateLabel(headerGo.transform, "Section", "ОРУЖИЕ", new Vector2(0f, -48f), 16, FontStyle.Normal, TextAnchor.MiddleCenter, SoftText);
 
             var closeButton = CreateCloseButton(body.transform);
 
@@ -728,14 +728,14 @@ namespace Aim.Editor
             weaponIcon.preserveAspect = true;
             weaponIcon.raycastTarget = false;
 
-            var name = CreateLabel(card.transform, "Name", "Weapon", new Vector2(-40f, 14f), 20, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
+            var name = CreateLabel(card.transform, "Name", "Оружие", new Vector2(-40f, 14f), 20, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
             name.rectTransform.anchorMin = new Vector2(0f, 0.5f);
             name.rectTransform.anchorMax = new Vector2(0f, 0.5f);
             name.rectTransform.pivot = new Vector2(0f, 0.5f);
             name.rectTransform.anchoredPosition = new Vector2(136f, 14f);
             name.rectTransform.sizeDelta = new Vector2(180f, 28f);
 
-            var status = CreateLabel(card.transform, "Status", "LOCKED", new Vector2(-40f, -14f), 14, FontStyle.Normal, TextAnchor.MiddleLeft, SoftText);
+            var status = CreateLabel(card.transform, "Status", "Заблокировано", new Vector2(-40f, -14f), 14, FontStyle.Normal, TextAnchor.MiddleLeft, SoftText);
             status.rectTransform.anchorMin = new Vector2(0f, 0.5f);
             status.rectTransform.anchorMax = new Vector2(0f, 0.5f);
             status.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -811,7 +811,7 @@ namespace Aim.Editor
             colors.disabledColor = new Color(0.25f, 0.28f, 0.32f, 0.85f);
             actionButton.colors = colors;
 
-            var actionLabel = CreateLabel(actionGo.transform, "ActionLabel", "Buy", Vector2.zero, 16, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
+            var actionLabel = CreateLabel(actionGo.transform, "ActionLabel", "Купить", Vector2.zero, 16, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
             actionLabel.rectTransform.anchorMin = Vector2.zero;
             actionLabel.rectTransform.anchorMax = Vector2.one;
             actionLabel.rectTransform.offsetMin = Vector2.zero;
@@ -979,6 +979,7 @@ namespace Aim.Editor
             text.color = color;
             text.text = content;
             text.raycastTarget = false;
+            LanguageYgTextUtility.AttachToTextComponent(text, content);
             return text;
         }
 

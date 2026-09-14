@@ -46,6 +46,7 @@ namespace Aim.Editor
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             Selection.activeGameObject = view.gameObject;
+            LanguageYgTextUtility.ConfigureAutoTranslateLanguages();
             Debug.Log("Main Menu UI rebuilt and linked to Bootstrap.");
         }
 
@@ -60,7 +61,7 @@ namespace Aim.Editor
             StretchFull(dimmer.rectTransform);
 
             var rootPanel = CreatePanel(root.transform, "RootPanel", new Vector2(380f, 250f));
-            CreateHeader(rootPanel.transform, "Aim Trainer");
+            CreateHeader(rootPanel.transform, "Тренажёр прицела");
             var campaign = CreateWideButton(rootPanel.transform, "CampaignButton", new Vector2(0f, 18f), "Кампания", CampaignFill);
             var modes = CreateWideButton(rootPanel.transform, "ModesButton", new Vector2(0f, -58f), "Выбор режима", ModesFill);
 
@@ -443,6 +444,7 @@ namespace Aim.Editor
             text.color = color;
             text.raycastTarget = false;
             text.text = content;
+            LanguageYgTextUtility.AttachToTextComponent(text, content);
             return text;
         }
 

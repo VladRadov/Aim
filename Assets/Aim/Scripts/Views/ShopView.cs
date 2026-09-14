@@ -133,11 +133,11 @@ namespace Aim.Views
             if (statusLabel != null)
             {
                 if (equipped)
-                    statusLabel.text = "EQUIPPED";
+                    statusLabel.text = "Надето";
                 else if (owned)
-                    statusLabel.text = "OWNED";
+                    statusLabel.text = "Куплено";
                 else
-                    statusLabel.text = "LOCKED";
+                    statusLabel.text = "Заблокировано";
             }
 
             if (actionButton != null)
@@ -146,13 +146,13 @@ namespace Aim.Views
                 if (equipped)
                 {
                     if (actionLabel != null)
-                        actionLabel.text = "Equipped";
+                        actionLabel.text = "Экипировано";
                     actionButton.interactable = false;
                 }
                 else if (owned)
                 {
                     if (actionLabel != null)
-                        actionLabel.text = "Equip";
+                        actionLabel.text = "Экипировать";
                     actionButton.interactable = true;
                     var id = entry.Id;
                     actionButton.onClick.AddListener(() => _equipRequested.OnNext(id));
@@ -160,7 +160,7 @@ namespace Aim.Views
                 else
                 {
                     if (actionLabel != null)
-                        actionLabel.text = canBuy ? "Buy" : "Need coins";
+                        actionLabel.text = canBuy ? "Купить" : "Нужно монет";
                     actionButton.interactable = canBuy;
                     var id = entry.Id;
                     actionButton.onClick.AddListener(() => _buyRequested.OnNext(id));

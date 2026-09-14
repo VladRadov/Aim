@@ -10,13 +10,15 @@ namespace Aim.Services
     {
         public readonly LevelType Type;
         public readonly string DisplayName;
+        public readonly string DisplayNameEn;
         public readonly string IconPath;
         public readonly LevelDefinition Template;
 
-        public GameModeInfo(LevelType type, string displayName, string iconPath, LevelDefinition template)
+        public GameModeInfo(LevelType type, string displayName, string displayNameEn, string iconPath, LevelDefinition template)
         {
             Type = type;
             DisplayName = displayName;
+            DisplayNameEn = displayNameEn;
             IconPath = iconPath;
             Template = template;
         }
@@ -52,6 +54,7 @@ namespace Aim.Services
                 _modes.Add(new GameModeInfo(
                     type,
                     GetDisplayName(type),
+                    GetDisplayNameEn(type),
                     GetIconPath(type),
                     template));
             }
@@ -88,6 +91,26 @@ namespace Aim.Services
             LevelType.PriorityTargets => "Приоритет",
             LevelType.PrecisionCircles => "Точность",
             LevelType.DoubleTap => "Мультихит",
+            _ => type.ToString()
+        };
+
+        public static string GetDisplayNameEn(LevelType type) => type switch
+        {
+            LevelType.CharacterHeadshot => "Headshots",
+            LevelType.FlyingObjects => "Flying targets",
+            LevelType.CustomHitZones => "Hit zones",
+            LevelType.ShootingGallery => "Gallery",
+            LevelType.BouncingBalls => "Bouncing balls",
+            LevelType.TrackingBall => "Tracking ball",
+            LevelType.TrackingMovers => "Tracking swarm",
+            LevelType.StaticBalls => "Static balls",
+            LevelType.FlickTargets => "Flick shots",
+            LevelType.PeekTargets => "Peek targets",
+            LevelType.MovingRails => "Rails",
+            LevelType.PopupDucks => "Popup targets",
+            LevelType.PriorityTargets => "Priority",
+            LevelType.PrecisionCircles => "Precision",
+            LevelType.DoubleTap => "Multi-hit",
             _ => type.ToString()
         };
 

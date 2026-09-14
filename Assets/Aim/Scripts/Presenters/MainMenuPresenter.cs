@@ -107,13 +107,13 @@ namespace Aim.Presenters
 
         void BuildModeCards()
         {
-            var cards = new List<(LevelType type, string title, Sprite icon)>();
+            var cards = new List<(LevelType type, string titleRu, string titleEn, Sprite icon)>();
             for (var i = 0; i < _catalog.Modes.Count; i++)
             {
                 var mode = _catalog.Modes[i];
                 var fileName = mode.Type.ToString().ToLowerInvariant() + "_icon";
                 var icon = Resources.Load<Sprite>("Modes/" + fileName);
-                cards.Add((mode.Type, mode.DisplayName, icon));
+                cards.Add((mode.Type, mode.DisplayName, mode.DisplayNameEn, icon));
             }
 
             _view.BindModeCards(cards);
@@ -129,6 +129,7 @@ namespace Aim.Presenters
             _model.ShowSetup(type, hits, ammo);
             _view.BindSetup(
                 info.DisplayName,
+                info.DisplayNameEn,
                 hits,
                 ammo,
                 info.AllowsShooting,

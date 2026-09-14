@@ -373,6 +373,7 @@ namespace Aim.Editor
             valueText.color = Color.white;
             valueText.raycastTarget = false;
             valueText.text = "0";
+            LanguageYgTextUtility.AttachToTextComponent(valueText, valueText.text);
 
             return valueText;
         }
@@ -488,6 +489,7 @@ namespace Aim.Editor
             valueText.color = Color.white;
             valueText.raycastTarget = false;
             valueText.text = "0 / 0";
+            LanguageYgTextUtility.AttachToTextComponent(valueText, valueText.text);
 
             return valueText;
         }
@@ -508,6 +510,7 @@ namespace Aim.Editor
             text.alignment = alignment;
             text.color = Color.white;
             text.raycastTarget = false;
+            LanguageYgTextUtility.AttachToTextComponent(text, text.text);
             return text;
         }
 

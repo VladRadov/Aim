@@ -460,6 +460,7 @@ namespace Aim.Editor
             text.color = color;
             text.raycastTarget = false;
             text.text = content;
+            LanguageYgTextUtility.AttachToTextComponent(text, content);
             return text;
         }
 

@@ -184,7 +184,7 @@ namespace Aim.Editor
                 "UI/Skin/UISprite.psd",
                 true);
 
-            CreateLabel(header.transform, "Title", "SETTINGS", new Vector2(0f, -22f), 32, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
+            CreateLabel(header.transform, "Title", "НАСТРОЙКИ", new Vector2(0f, -22f), 32, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
 
             var closeButton = CreateCloseButton(body.transform);
 
@@ -193,14 +193,14 @@ namespace Aim.Editor
                 "MusicRow",
                 new Vector2(0f, 35f),
                 "Assets/Aim/Sprites/music_icon.png",
-                "Music");
+                "Музыка");
 
             var sfxSlider = CreateSliderCard(
                 body.transform,
                 "SfxRow",
                 new Vector2(0f, -75f),
                 "Assets/Aim/Sprites/sfx_icon.png",
-                "Sounds");
+                "Звуки");
 
             var view = root.AddComponent<SettingsView>();
             SetObjectField(view, "settingsButton", settingsButton);
@@ -525,6 +525,7 @@ namespace Aim.Editor
             text.color = color;
             text.text = content;
             text.raycastTarget = false;
+            LanguageYgTextUtility.AttachToTextComponent(text, content);
             return text;
         }
 

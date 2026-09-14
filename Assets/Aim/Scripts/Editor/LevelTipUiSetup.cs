@@ -183,6 +183,7 @@ namespace Aim.Editor
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             text.verticalOverflow = VerticalWrapMode.Truncate;
             text.text = content;
+            LanguageYgTextUtility.AttachToTextComponent(text, content);
             return text;
         }
 
