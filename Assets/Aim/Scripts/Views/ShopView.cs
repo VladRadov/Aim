@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Aim.Config;
+using Aim.Services;
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
@@ -130,37 +131,34 @@ namespace Aim.Views
             if (priceIcon != null)
                 priceIcon.enabled = !owned;
 
-            if (statusLabel != null)
-            {
-                if (equipped)
-                    statusLabel.text = "Надето";
-                else if (owned)
-                    statusLabel.text = "Куплено";
-                else
-                    statusLabel.text = "Заблокировано";
-            }
+            if (equipped)
+                LanguageYgBinding.SetTranslations(statusLabel, "Надето", "Equipped");
+            else if (owned)
+                LanguageYgBinding.SetTranslations(statusLabel, "Куплено", "Owned");
+            else
+                LanguageYgBinding.SetTranslations(statusLabel, "Заблокировано", "Locked");
 
             if (actionButton != null)
             {
                 actionButton.onClick.RemoveAllListeners();
                 if (equipped)
                 {
-                    if (actionLabel != null)
-                        actionLabel.text = "Экипировано";
+                    LanguageYgBinding.SetTranslations(actionLabel, "Экипировано", "Equipped");
                     actionButton.interactable = false;
                 }
                 else if (owned)
                 {
-                    if (actionLabel != null)
-                        actionLabel.text = "Экипировать";
+                    LanguageYgBinding.SetTranslations(actionLabel, "Экипировать", "Equip");
                     actionButton.interactable = true;
                     var id = entry.Id;
                     actionButton.onClick.AddListener(() => _equipRequested.OnNext(id));
                 }
                 else
                 {
-                    if (actionLabel != null)
-                        actionLabel.text = canBuy ? "Купить" : "Нужно монет";
+                    if (canBuy)
+                        LanguageYgBinding.SetTranslations(actionLabel, "Купить", "Buy");
+                    else
+                        LanguageYgBinding.SetTranslations(actionLabel, "Нужно монет", "Need coins");
                     actionButton.interactable = canBuy;
                     var id = entry.Id;
                     actionButton.onClick.AddListener(() => _buyRequested.OnNext(id));

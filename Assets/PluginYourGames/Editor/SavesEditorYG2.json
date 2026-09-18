@@ -4,7 +4,7 @@
     "coins": 2385,
     "campaignIndex": 17,
     "ownedWeapons": "pistol_k|pistol_o|pistol_n|pistol_n_preset|pistol_o_preset|pistol_l_preset|pistol_l",
-    "equippedWeapon": "pistol_l",
+    "equippedWeapon": "pistol_k",
     "levelRecords": [],
     "intExample": 5,
     "strExample": "Hello!",
@@ -14,5 +14,5 @@
         false,
         false
     ],
-    "idSave": 6
+    "idSave": 10
 }

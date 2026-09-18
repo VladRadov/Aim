@@ -19,8 +19,7 @@ namespace Aim.Presenters
             if (_view == null || definition == null)
                 return;
 
-            var tip = LevelTipCatalog.GetTip(definition);
-            _view.ShowTip(tip.Title, tip.Body, tip.ModeLine);
+            _view.ShowTip(LevelTipCatalog.GetTip(definition));
         }
 
         public void Hide()

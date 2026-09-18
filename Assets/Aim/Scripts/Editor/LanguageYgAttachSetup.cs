@@ -50,14 +50,19 @@ namespace Aim.Editor
             ["Купить"] = "Buy",
             ["Экипировать"] = "Equip",
             ["Экипировано"] = "Equipped",
-            ["Куплено"] = "OWNED",
-            ["Надето"] = "EQUIPPED",
-            ["Заблокировано"] = "LOCKED",
+            ["Куплено"] = "Owned",
+            ["Надето"] = "Equipped",
+            ["Заблокировано"] = "Locked",
             ["Оружие"] = "Weapon",
             ["Звуки"] = "Sounds",
             ["Музыка"] = "Music",
             ["Описание уровня"] = "Level description",
             ["Стрельба · 1 выстрел"] = "Shooting · 1 shot",
+            ["Стрельба · 1 выстрел · без полоски HP"] = "Shooting · 1 shot · no HP bar",
+            ["Без стрельбы · полоска HP · держи прицел"] = "No shooting · HP bar · hold the crosshair",
+            ["Стрельба · несколько попаданий · есть полоска HP"] = "Shooting · several hits · HP bar",
+            ["Стрельба"] = "Shooting",
+            ["Без стрельбы"] = "No shooting",
             ["Уровень"] = "Level",
             ["Нужно монет"] = "Need coins",
             ["Хедшоты"] = "Headshots",
@@ -232,7 +237,7 @@ namespace Aim.Editor
 
         static bool IsRuntimeDrivenLabel(string objectName)
         {
-            return objectName is "Name" or "Status" or "ActionLabel" or "Record" or "Mode" or "Body";
+            return objectName is "Name" or "Price" or "Record";
         }
 
         static void ApplyVisibleText(GameObject go, string value)

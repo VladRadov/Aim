@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Aim.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,9 +24,7 @@ namespace Aim.Views
         CancellationTokenSource _animationCts;
         Vector2 _shownPosition;
         bool _ready;
-        string _pendingTitle;
-        string _pendingBody;
-        string _pendingMode;
+        LevelTipContent _pendingTip;
         bool _hasPendingTip;
 
         void Awake()
@@ -37,30 +36,24 @@ namespace Aim.Views
             if (_hasPendingTip)
             {
                 _hasPendingTip = false;
-                ShowTip(_pendingTitle, _pendingBody, _pendingMode);
+                ShowTip(_pendingTip);
             }
         }
 
-        public void ShowTip(string title, string body, string modeLine)
+        public void ShowTip(LevelTipContent tip)
         {
             // Bootstrap may start the first level during Awake before this view is ready.
             if (!_ready)
             {
-                _pendingTitle = title;
-                _pendingBody = body;
-                _pendingMode = modeLine;
+                _pendingTip = tip;
                 _hasPendingTip = true;
                 return;
             }
 
             ApplyCompactTopLayout();
-
-            if (titleText != null)
-                titleText.text = title ?? string.Empty;
-            if (bodyText != null)
-                bodyText.text = body ?? string.Empty;
-            if (modeText != null)
-                modeText.text = modeLine ?? string.Empty;
+            LanguageYgBinding.SetTranslations(titleText, tip.TitleRu, tip.TitleEn);
+            LanguageYgBinding.SetTranslations(bodyText, tip.BodyRu, tip.BodyEn);
+            LanguageYgBinding.SetTranslations(modeText, tip.ModeRu, tip.ModeEn);
 
             ShowSequenceAsync().Forget();
         }

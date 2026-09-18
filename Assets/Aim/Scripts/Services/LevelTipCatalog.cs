@@ -5,110 +5,153 @@ namespace Aim.Services
 {
     public readonly struct LevelTipContent
     {
-        public readonly string Title;
-        public readonly string Body;
-        public readonly string ModeLine;
+        public readonly string TitleRu;
+        public readonly string TitleEn;
+        public readonly string BodyRu;
+        public readonly string BodyEn;
+        public readonly string ModeRu;
+        public readonly string ModeEn;
 
-        public LevelTipContent(string title, string body, string modeLine)
+        public LevelTipContent(
+            string titleRu,
+            string titleEn,
+            string bodyRu,
+            string bodyEn,
+            string modeRu,
+            string modeEn)
         {
-            Title = title;
-            Body = body;
-            ModeLine = modeLine;
+            TitleRu = titleRu;
+            TitleEn = titleEn;
+            BodyRu = bodyRu;
+            BodyEn = bodyEn;
+            ModeRu = modeRu;
+            ModeEn = modeEn;
         }
     }
 
     public static class LevelTipCatalog
     {
+        const string ShootModeRu = "Стрельба · 1 выстрел · без полоски HP";
+        const string ShootModeEn = "Shooting · 1 shot · no HP bar";
+        const string TrackModeRu = "Без стрельбы · полоска HP · держи прицел";
+        const string TrackModeEn = "No shooting · HP bar · hold the crosshair";
+        const string MultiHitModeRu = "Стрельба · несколько попаданий · есть полоска HP";
+        const string MultiHitModeEn = "Shooting · several hits · HP bar";
+
         public static LevelTipContent GetTip(LevelDefinition definition)
         {
             if (definition == null)
-                return new LevelTipContent("Уровень", "Следуй цели на HUD.", "—");
+            {
+                return new LevelTipContent(
+                    "Уровень",
+                    "Level",
+                    "Следуй цели на HUD.",
+                    "Follow the objective on the HUD.",
+                    "—",
+                    "—");
+            }
 
-            var title = string.IsNullOrWhiteSpace(definition.DisplayName)
-                ? "Уровень"
-                : definition.DisplayName;
+            var titleRu = GameModeCatalog.GetDisplayName(definition.LevelType);
+            var titleEn = GameModeCatalog.GetDisplayNameEn(definition.LevelType);
 
             return definition.LevelType switch
             {
                 LevelType.CharacterHeadshot => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Стреляй только в голову персонажей. Попадания в тело не считаются.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot only the characters' heads. Body shots do not count.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.FlyingObjects => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Сбивай летящие шары, пока они не исчезли.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot the flying balls before they disappear.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.CustomHitZones => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Попади в подсвеченную зону на мишени. Остальные зоны не дают очко.",
-                    "Стрельба · 1 точное попадание · без полоски HP"),
+                    "Hit the highlighted zone on the target. Other zones do not score.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.ShootingGallery => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Стреляй только в подсвеченную банку. После попадания цель сменится.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot only the highlighted can. After a hit the target changes.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.BouncingBalls => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Сбивай прыгающие шары. Они остаются, пока ты их не поразишь.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot the bouncing balls. They stay until you hit them.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.TrackingBall => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Не стреляй. Держи прицел на большом шаре — так снимается HP.",
-                    "Без стрельбы · полоска HP · держи прицел"),
+                    "Do not shoot. Keep the crosshair on the big ball to drain HP.",
+                    TrackModeRu, TrackModeEn),
 
                 LevelType.TrackingMovers => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Не стреляй. Следи прицелом за движущимися шарами и снимай их HP.",
-                    "Без стрельбы · полоска HP · держи прицел"),
+                    "Do not shoot. Track the moving balls with the crosshair to drain HP.",
+                    TrackModeRu, TrackModeEn),
 
                 LevelType.StaticBalls => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Стреляй по неподвижным шарам, пока они не пропали.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot the static balls before they disappear.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.FlickTargets => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Шары вспыхивают коротко. Быстро фликай прицелом и успей выстрелить.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Balls flash briefly. Flick the crosshair quickly and shoot in time.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.PeekTargets => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Шары выглядывают из-за укрытий. Стреляй только когда цель видна.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Balls peek from cover. Shoot only while the target is visible.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.MovingRails => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Шары едут по рельсам туда-обратно. Веди прицел с упреждением.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Balls move back and forth on rails. Lead the crosshair.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.PopupDucks => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Мишени поднимаются и опускаются. Стреляй только пока они наверху.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Targets rise and drop. Shoot only while they are up.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.PriorityTargets => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Стреляй только в жёлтую приоритетную цель. Серые не дают очко.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Shoot only the yellow priority target. Grey ones do not score.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.PrecisionCircles => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Маленькие цели на разной дистанции. Стреляй точно, патронов мало.",
-                    "Стрельба · 1 выстрел · без полоски HP"),
+                    "Small targets at different distances. Shoot accurately — ammo is limited.",
+                    ShootModeRu, ShootModeEn),
 
                 LevelType.DoubleTap => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "У шаров несколько HP. Смотри полоску сверху и добивай цель.",
-                    "Стрельба · несколько попаданий · есть полоска HP"),
+                    "Balls have several HP. Watch the bar on top and finish the target.",
+                    MultiHitModeRu, MultiHitModeEn),
 
                 _ => new LevelTipContent(
-                    title,
+                    titleRu, titleEn,
                     "Выполни цель уровня по счётчику попаданий.",
-                    definition.AllowsShooting ? "Стрельба" : "Без стрельбы")
+                    "Complete the level objective on the hit counter.",
+                    definition.AllowsShooting ? "Стрельба" : "Без стрельбы",
+                    definition.AllowsShooting ? "Shooting" : "No shooting")
             };
         }
     }
