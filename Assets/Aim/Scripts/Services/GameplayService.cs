@@ -4,99 +4,96 @@ using Aim.Models;
 using Aim.Presenters;
 using Aim.Views;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class GameplayService : IDisposable
+    public sealed class GameplayService : MonoBehaviour, IEntityService, IDisposable
     {
-        readonly AimModel _aimModel;
-        readonly ShootModel _shootModel;
-        readonly RecoilModel _recoilModel;
-        readonly ProjectilePool _projectilePool;
-        readonly ParticleFxService _fxService;
-        readonly AimPresenter _aimPresenter;
-        readonly ShootPresenter _shootPresenter;
-        readonly CrosshairPresenter _crosshairPresenter;
-        readonly RecoilPresenter _recoilPresenter;
-        readonly WeaponView _weaponView;
+        [Inject] AimTrainerConfig _config;
+        [Inject] SessionModel _session;
+        [Inject] SettingsModel _settings;
+        [Inject] AimModel _aimModel;
+        [Inject] ShootModel _shootModel;
+        [Inject] RecoilModel _recoilModel;
+        [Inject] InputView _inputView;
+        [Inject] CameraLookView _cameraLookView;
+        [Inject] WeaponView _weaponView;
+        [Inject] CrosshairView _crosshairView;
+        [Inject] Camera _shootCamera;
+        [Inject(Id = "ProjectilesRoot")] Transform _projectilesRoot;
+        [Inject] ShopModel _shopModel;
+            [Inject(Id = "DefaultWeapon", Optional = true)] GameObject _defaultWeapon;
+
+        ProjectilePool _projectilePool;
+        ParticleFxService _fxService;
+        AimPresenter _aimPresenter;
+        ShootPresenter _shootPresenter;
+        CrosshairPresenter _crosshairPresenter;
+        RecoilPresenter _recoilPresenter;
 
         public AimModel AimModel => _aimModel;
         public ShootModel ShootModel => _shootModel;
 
-        public GameplayService(
-            AimTrainerConfig config,
-            SessionModel session,
-            SettingsModel settings,
-            InputView inputView,
-            CameraLookView cameraLookView,
-            WeaponView weaponView,
-            CrosshairView crosshairView,
-            Camera shootCamera,
-            Transform projectilesRoot,
-            GameObject weaponPrefab)
+        public void Initialize()
         {
-            _weaponView = weaponView;
-            _aimModel = new AimModel(config.MinPitch, config.MaxPitch);
-            _shootModel = new ShootModel();
-            _recoilModel = new RecoilModel();
-
-            if (config.BulletPrefab == null)
+            if (_config.BulletPrefab == null)
                 Debug.LogWarning("GameplayService: bullet prefab is not assigned in AimTrainerConfig.");
 
-            var fxRoot = projectilesRoot.Find("Fx") ?? new GameObject("Fx").transform;
-            if (fxRoot.parent != projectilesRoot)
-                fxRoot.SetParent(projectilesRoot, false);
+            var fxRoot = _projectilesRoot.Find("Fx") ?? new GameObject("Fx").transform;
+            if (fxRoot.parent != _projectilesRoot)
+                fxRoot.SetParent(_projectilesRoot, false);
 
-            _projectilePool = new ProjectilePool(config.BulletPrefab, projectilesRoot);
-            // Hit sparks are runtime-generated (WarFX auto-destruct was breaking pooled hit FX on targets).
-            _fxService = new ParticleFxService(config.MuzzleFlashPrefab, fxRoot);
+            _projectilePool = new ProjectilePool(_config.BulletPrefab, _projectilesRoot);
+            _fxService = new ParticleFxService(_config.MuzzleFlashPrefab, fxRoot);
 
             var projectileService = new ProjectileService(
                 _projectilePool,
-                config.BulletSpeed,
-                config.ShootMaxDistance,
-                config.TargetLayerMask);
-            var aimDirectionService = new AimDirectionService(config.ShootMaxDistance, config.AimPointLayerMask);
+                _config.BulletSpeed,
+                _config.ShootMaxDistance,
+                _config.TargetLayerMask);
+            var aimDirectionService = new AimDirectionService(_config.ShootMaxDistance, _config.AimPointLayerMask);
 
-            weaponView.ConfigureMountPosition(config.WeaponMountLocalPosition);
-            crosshairView.Configure(
-                config.CrosshairDefaultColor,
-                config.CrosshairHitColor,
-                config.CrosshairHitFlashDuration);
+            _weaponView.ConfigureMountPosition(_config.WeaponMountLocalPosition);
+            _crosshairView.Configure(
+                _config.CrosshairDefaultColor,
+                _config.CrosshairHitColor,
+                _config.CrosshairHitFlashDuration);
 
-            _aimPresenter = new AimPresenter(_aimModel, inputView, cameraLookView, config.MouseSensitivity);
+            _aimPresenter = new AimPresenter(_aimModel, _inputView, _cameraLookView, _config.MouseSensitivity);
             _shootPresenter = new ShootPresenter(
                 _shootModel,
-                session,
-                settings,
+                _session,
+                _settings,
                 projectileService,
                 aimDirectionService,
                 _fxService,
-                inputView,
-                weaponView,
-                shootCamera);
-            _crosshairPresenter = new CrosshairPresenter(_shootModel, crosshairView);
+                _inputView,
+                _weaponView,
+                _shootCamera);
+            _crosshairPresenter = new CrosshairPresenter(_shootModel, _crosshairView);
             _recoilPresenter = new RecoilPresenter(
                 _recoilModel,
                 _aimModel,
-                weaponView,
-                cameraLookView,
+                _weaponView,
+                _cameraLookView,
                 _shootPresenter.AcceptedShotStream,
-                config.RecoilWeaponPitch,
-                config.RecoilWeaponYawRange,
-                config.RecoilWeaponKickback,
-                config.RecoilWeaponRollRange,
-                config.RecoilRecoverySpeed,
-                config.RecoilCameraPitch,
-                config.RecoilCameraYawRange);
+                _config.RecoilWeaponPitch,
+                _config.RecoilWeaponYawRange,
+                _config.RecoilWeaponKickback,
+                _config.RecoilWeaponRollRange,
+                _config.RecoilRecoverySpeed,
+                _config.RecoilCameraPitch,
+                _config.RecoilCameraYawRange);
 
             _aimPresenter.Initialize();
             _shootPresenter.Initialize();
             _crosshairPresenter.Initialize();
             _recoilPresenter.Initialize();
 
-            if (weaponPrefab != null)
-                EquipWeaponPrefab(weaponPrefab);
+            var startingWeapon = ResolveStartingWeaponPrefab();
+            if (startingWeapon != null)
+                EquipWeaponPrefab(startingWeapon);
         }
 
         public void EquipWeaponPrefab(GameObject weaponPrefab)
@@ -108,15 +105,31 @@ namespace Aim.Services
             _fxService.BindMuzzle(_weaponView.MuzzlePoint);
         }
 
+        public void EquipWeaponById(string weaponId)
+        {
+            var entry = _shopModel?.FindById(weaponId);
+            if (entry?.Prefab == null)
+                return;
+
+            EquipWeaponPrefab(entry.Prefab);
+        }
+
+        GameObject ResolveStartingWeaponPrefab()
+        {
+            var equipped = _shopModel?.GetEquippedEntry();
+            if (equipped?.Prefab != null)
+                return equipped.Prefab;
+            return _defaultWeapon;
+        }
+
+        void OnDestroy() => Dispose();
+
         public void Dispose()
         {
             _aimPresenter?.Dispose();
             _shootPresenter?.Dispose();
             _crosshairPresenter?.Dispose();
             _recoilPresenter?.Dispose();
-            _aimModel?.Dispose();
-            _shootModel?.Dispose();
-            _recoilModel?.Dispose();
             _fxService?.Dispose();
             _projectilePool?.Dispose();
         }

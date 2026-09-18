@@ -1,5 +1,6 @@
 using Aim;
 using Aim.Config;
+using Aim.Installers;
 using Aim.Views;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -88,6 +89,16 @@ namespace Aim.Editor
 
             EnsureMainThreadDispatcher();
             CreateTrainingArena(config);
+            MvcCompositionSetup.Setup();
+
+            var installer = Object.FindAnyObjectByType<GameInstaller>();
+            if (installer != null)
+            {
+                SetPrivateField(installer, "config", config);
+                SetPrivateField(installer, "shootCamera", cameraGo.GetComponent<Camera>());
+                SetPrivateField(installer, "projectilesRoot", projectilesRoot);
+                SetPrivateField(installer, "targetsRoot", targetsRoot);
+            }
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             Selection.activeGameObject = bootstrapGo;

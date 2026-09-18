@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Aim.Models;
+using Aim.Services;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -123,7 +124,7 @@ namespace Aim.Views
                 setupPanel.SetActive(screen == MainMenuScreen.Setup);
         }
 
-        public void BindModeCards(IReadOnlyList<(LevelType type, string title, Sprite icon)> modes)
+        public void BindModeCards(IReadOnlyList<(LevelType type, string titleRu, string titleEn, Sprite icon)> modes)
         {
             ClearCards();
             if (modesGrid == null || modeCardPrefab == null || modes == null)
@@ -133,12 +134,12 @@ namespace Aim.Views
             {
                 var mode = modes[i];
                 var card = Instantiate(modeCardPrefab, modesGrid);
-                card.SetActive(true);
+                card.SetActive(false);
                 _spawnedCards.Add(card);
 
                 var title = card.transform.Find("Title")?.GetComponent<Text>();
                 if (title != null)
-                    title.text = mode.title;
+                    LanguageYgBinding.SetTranslations(title, mode.titleRu, mode.titleEn);
 
                 var cover = card.transform.Find("Cover")?.GetComponent<Image>();
                 if (cover != null)
@@ -154,13 +155,15 @@ namespace Aim.Views
                     var captured = mode.type;
                     button.onClick.AddListener(() => _modeSelected.OnNext(captured));
                 }
+
+                card.SetActive(true);
             }
         }
 
-        public void BindSetup(string title, int hits, int ammo, bool showAmmo, int hitsMin, int hitsMax, int ammoMin, int ammoMax)
+        public void BindSetup(string titleRu, string titleEn, int hits, int ammo, bool showAmmo, int hitsMin, int hitsMax, int ammoMin, int ammoMax)
         {
             if (setupTitleText != null)
-                setupTitleText.text = title;
+                LanguageYgBinding.SetTranslations(setupTitleText, titleRu, titleEn);
 
             if (ammoRow != null)
                 ammoRow.SetActive(showAmmo);

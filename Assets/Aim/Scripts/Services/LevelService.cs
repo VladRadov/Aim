@@ -7,24 +7,31 @@ using Aim.Presenters;
 using Aim.Views;
 using UniRx;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class LevelService : IDisposable
+    public sealed class LevelService : MonoBehaviour, IEntityService, IDisposable
     {
-        readonly SessionModel _session;
-        readonly CoinsModel _coins;
-        readonly SettingsModel _settings;
-        readonly LevelWinModel _winModel;
-        readonly MainMenuModel _mainMenuModel;
-        readonly LevelRunStatsTracker _statsTracker;
+        [Inject] SessionModel _session;
+        [Inject] CoinsModel _coins;
+        [Inject] SettingsModel _settings;
+        [Inject] LevelWinModel _winModel;
+        [Inject] MainMenuModel _mainMenuModel;
+        [Inject] LevelRunStatsTracker _statsTracker;
+        [Inject] AimTrainerConfig _config;
+        [Inject(Id = "TargetsRoot")] Transform _targetsRoot;
+        [Inject] Camera _aimCamera;
+        [Inject] LevelWinView _levelWinView;
+        [Inject] LevelTipView _levelTipView;
+        [Inject] InputView _inputView;
+
         readonly CampaignProgressStore _campaignProgress = new();
-        readonly AimTrainerConfig _config;
-        readonly LevelController _controller;
         readonly List<LevelDefinition> _campaignPlaylist = new();
         readonly List<LevelDefinition> _playlist = new();
         readonly CompositeDisposable _disposables = new();
 
+        LevelController _controller;
         LevelWinPresenter _winPresenter;
         LevelTipPresenter _tipPresenter;
         int _index = -1;
@@ -33,7 +40,7 @@ namespace Aim.Services
         int? _ammoOverride;
 
         public LevelController Controller => _controller;
-        public LevelDefinition ActiveLevel => _controller.ActiveDefinition;
+        public LevelDefinition ActiveLevel => _controller != null ? _controller.ActiveDefinition : null;
         public IReadOnlyList<LevelDefinition> Playlist => _playlist;
         public int CurrentIndex => _index;
         public bool IsCampaign => _isCampaign;
@@ -46,30 +53,14 @@ namespace Aim.Services
             _index + 1 < _playlist.Count &&
             _playlist[_index + 1] != null;
 
-        public LevelService(
-            SessionModel session,
-            CoinsModel coins,
-            SettingsModel settings,
-            LevelWinModel winModel,
-            MainMenuModel mainMenuModel,
-            LevelRunStatsTracker statsTracker,
-            AimTrainerConfig config,
-            Transform targetsRoot,
-            Camera aimCamera)
+        public void Initialize()
         {
-            _session = session ?? throw new ArgumentNullException(nameof(session));
-            _coins = coins ?? throw new ArgumentNullException(nameof(coins));
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _winModel = winModel ?? throw new ArgumentNullException(nameof(winModel));
-            _mainMenuModel = mainMenuModel ?? throw new ArgumentNullException(nameof(mainMenuModel));
-            _statsTracker = statsTracker ?? throw new ArgumentNullException(nameof(statsTracker));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
             _controller = new LevelController(
-                session,
-                settings,
-                targetsRoot,
-                aimCamera,
-                config.TargetLayerMask);
+                _session,
+                _settings,
+                _targetsRoot,
+                _aimCamera,
+                _config.TargetLayerMask);
 
             _session.State
                 .Where(state => state == LevelState.Won || state == LevelState.Lost)
@@ -85,6 +76,10 @@ namespace Aim.Services
                     _controller.StopLevel(resetSession: false);
                 })
                 .AddTo(_disposables);
+
+            BindWinUi(_levelWinView, _inputView);
+            BindTipUi(_levelTipView);
+            SetCampaignPlaylist(_config.Levels);
         }
 
         public void BindWinUi(LevelWinView view, InputView inputView)
@@ -227,8 +222,10 @@ namespace Aim.Services
         public void Stop()
         {
             _tipPresenter?.Hide();
-            _controller.StopLevel(resetSession: true);
+            _controller?.StopLevel(resetSession: true);
         }
+
+        void OnDestroy() => Dispose();
 
         public void Dispose()
         {
@@ -237,7 +234,7 @@ namespace Aim.Services
             _tipPresenter?.Dispose();
             _tipPresenter = null;
             _disposables.Dispose();
-            _controller.Dispose();
+            _controller?.Dispose();
         }
     }
 }

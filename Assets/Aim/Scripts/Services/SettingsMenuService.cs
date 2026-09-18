@@ -3,39 +3,40 @@ using Aim.Models;
 using Aim.Presenters;
 using Aim.Views;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class SettingsMenuService : IDisposable
+    public sealed class SettingsMenuService : MonoBehaviour, IEntityService, IDisposable
     {
-        readonly SettingsPresenter _settingsPresenter;
-        readonly AudioSettingsService _audioService;
+        [Inject] SettingsModel _settings;
+        [Inject] LevelWinModel _levelWin;
+        [Inject] ShopModel _shop;
+        [Inject] MainMenuModel _mainMenu;
+        [Inject] SettingsView _settingsView;
+        [Inject] InputView _inputView;
+        [Inject] AudioSettingsService _audioService;
 
-        public SettingsMenuService(
-            SettingsModel settings,
-            LevelWinModel levelWin,
-            SettingsView settingsView,
-            InputView inputView,
-            AudioSource musicSource,
-            AudioSource sfxSource,
-            Func<bool> isOtherUiOpen = null)
+        SettingsPresenter _settingsPresenter;
+
+        public void Initialize()
         {
-            _audioService = new AudioSettingsService(musicSource, sfxSource);
-
-            if (settingsView == null)
+            if (_settingsView == null)
             {
                 Debug.LogWarning("SettingsMenuService: SettingsView is not assigned. Run Aim/Rebuild Settings UI.");
                 return;
             }
 
             _settingsPresenter = new SettingsPresenter(
-                settings,
-                settingsView,
+                _settings,
+                _settingsView,
                 _audioService,
-                inputView,
-                () => levelWin.IsOpen.Value || (isOtherUiOpen?.Invoke() ?? false));
+                _inputView,
+                () => _levelWin.IsOpen.Value || _shop.IsOpen.Value || _mainMenu.IsOpen.Value);
             _settingsPresenter.Initialize();
         }
+
+        void OnDestroy() => Dispose();
 
         public void Dispose()
         {

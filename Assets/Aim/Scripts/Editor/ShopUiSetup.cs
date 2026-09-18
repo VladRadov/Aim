@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Aim;
 using Aim.Config;
+using Aim.Installers;
 using Aim.Views;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -69,6 +70,10 @@ namespace Aim.Editor
                 SetObjectField(bootstrap, "shopView", shop);
                 SetObjectField(bootstrap, "weaponShopCatalog", catalog);
             }
+
+            var installer = Object.FindAnyObjectByType<GameInstaller>();
+            if (installer != null)
+                SetObjectField(installer, "weaponShopCatalog", catalog);
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
             Selection.activeGameObject = shop.gameObject;

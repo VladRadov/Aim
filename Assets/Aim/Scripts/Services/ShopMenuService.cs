@@ -3,40 +3,44 @@ using Aim.Models;
 using Aim.Presenters;
 using Aim.Views;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class ShopMenuService : IDisposable
+    public sealed class ShopMenuService : MonoBehaviour, IEntityService, IDisposable
     {
-        readonly ShopPresenter _shopPresenter;
+        [Inject] ShopModel _shopModel;
+        [Inject] CoinsModel _coinsModel;
+        [Inject] SettingsModel _settingsModel;
+        [Inject] LevelWinModel _levelWinModel;
+        [Inject] MainMenuModel _mainMenuModel;
+        [Inject] ShopView _shopView;
+        [Inject] InputView _inputView;
+        [Inject] GameplayService _gameplayService;
 
-        public ShopMenuService(
-            ShopModel shopModel,
-            CoinsModel coinsModel,
-            SettingsModel settingsModel,
-            LevelWinModel levelWinModel,
-            ShopView shopView,
-            InputView inputView,
-            Action<string> onEquipWeapon,
-            Func<bool> isOtherUiOpen = null)
+        ShopPresenter _shopPresenter;
+
+        public void Initialize()
         {
-            if (shopView == null)
+            if (_shopView == null)
             {
                 Debug.LogWarning("ShopMenuService: ShopView is not assigned. Run Aim/Rebuild Shop UI.");
                 return;
             }
 
             _shopPresenter = new ShopPresenter(
-                shopModel,
-                coinsModel,
-                shopView,
-                inputView,
-                onEquipWeapon,
-                () => settingsModel.IsOpen.Value ||
-                      levelWinModel.IsOpen.Value ||
-                      (isOtherUiOpen?.Invoke() ?? false));
+                _shopModel,
+                _coinsModel,
+                _shopView,
+                _inputView,
+                _gameplayService.EquipWeaponById,
+                () => _settingsModel.IsOpen.Value ||
+                      _levelWinModel.IsOpen.Value ||
+                      _mainMenuModel.IsOpen.Value);
             _shopPresenter.Initialize();
         }
+
+        void OnDestroy() => Dispose();
 
         public void Dispose() => _shopPresenter?.Dispose();
     }

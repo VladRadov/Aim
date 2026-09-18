@@ -1,18 +1,16 @@
 using Aim.Models;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class AudioSettingsService
+    public sealed class AudioSettingsService : MonoBehaviour
     {
-        readonly AudioSource _musicSource;
-        readonly AudioSource _sfxSource;
+        [Inject(Id = "Music", Optional = true)]
+        AudioSource _musicSource;
 
-        public AudioSettingsService(AudioSource musicSource, AudioSource sfxSource)
-        {
-            _musicSource = musicSource;
-            _sfxSource = sfxSource;
-        }
+        [Inject(Id = "Sfx", Optional = true)]
+        AudioSource _sfxSource;
 
         public void Apply(SettingsModel settings)
         {

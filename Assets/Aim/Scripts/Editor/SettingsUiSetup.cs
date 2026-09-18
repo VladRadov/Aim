@@ -1,4 +1,5 @@
 using Aim;
+using Aim.Installers;
 using Aim.Views;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -41,35 +42,45 @@ namespace Aim.Editor
                 Object.DestroyImmediate(existing.gameObject);
 
             var settings = CreateSettingsUi(canvas.transform);
+            var installer = Object.FindAnyObjectByType<GameInstaller>();
             var bootstrap = Object.FindAnyObjectByType<Bootstrap>();
             if (bootstrap != null)
-            {
                 SetObjectField(bootstrap, "settingsView", settings);
 
-                var audioRoot = GameObject.Find("GameAudio") ?? new GameObject("GameAudio");
-                var music = audioRoot.GetComponent<AudioSource>() ?? audioRoot.AddComponent<AudioSource>();
-                music.loop = true;
-                music.playOnAwake = false;
-                music.spatialBlend = 0f;
+            var audioRoot = GameObject.Find("GameAudio") ?? GameObject.Find("AudioService");
+            if (audioRoot == null)
+                audioRoot = new GameObject("GameAudio");
+            var music = audioRoot.GetComponent<AudioSource>() ?? audioRoot.AddComponent<AudioSource>();
+            music.loop = true;
+            music.playOnAwake = false;
+            music.spatialBlend = 0f;
 
-                var sfxTransform = audioRoot.transform.Find("SfxSource");
-                AudioSource sfx;
-                if (sfxTransform == null)
-                {
-                    var sfxGo = new GameObject("SfxSource");
-                    sfxGo.transform.SetParent(audioRoot.transform, false);
-                    sfx = sfxGo.AddComponent<AudioSource>();
-                }
-                else
-                {
-                    sfx = sfxTransform.GetComponent<AudioSource>() ?? sfxTransform.gameObject.AddComponent<AudioSource>();
-                }
+            var sfxTransform = audioRoot.transform.Find("SfxSource");
+            AudioSource sfx;
+            if (sfxTransform == null)
+            {
+                var sfxGo = new GameObject("SfxSource");
+                sfxGo.transform.SetParent(audioRoot.transform, false);
+                sfx = sfxGo.AddComponent<AudioSource>();
+            }
+            else
+            {
+                sfx = sfxTransform.GetComponent<AudioSource>() ?? sfxTransform.gameObject.AddComponent<AudioSource>();
+            }
 
-                sfx.playOnAwake = false;
-                sfx.spatialBlend = 0f;
+            sfx.playOnAwake = false;
+            sfx.spatialBlend = 0f;
 
+            if (bootstrap != null)
+            {
                 SetObjectField(bootstrap, "musicSource", music);
                 SetObjectField(bootstrap, "sfxSource", sfx);
+            }
+
+            if (installer != null)
+            {
+                SetObjectField(installer, "musicSource", music);
+                SetObjectField(installer, "sfxSource", sfx);
             }
 
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());

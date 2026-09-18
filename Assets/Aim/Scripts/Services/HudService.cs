@@ -4,31 +4,33 @@ using Aim.Models;
 using Aim.Presenters;
 using Aim.Views;
 using UnityEngine;
+using Zenject;
 
 namespace Aim.Services
 {
-    public sealed class HudService : IDisposable
+    public sealed class HudService : MonoBehaviour, IEntityService, IDisposable
     {
-        readonly SessionHudPresenter _sessionHudPresenter;
-        readonly CoinsHudPresenter _coinsHudPresenter;
-        readonly CoinsRewardPresenter _coinsRewardPresenter;
+        [Inject] SessionModel _session;
+        [Inject] CoinsModel _coins;
+        [Inject] AimTrainerConfig _config;
+        [Inject] SessionHudView _sessionHudView;
+        [Inject] CoinsHudView _coinsHudView;
 
-        public HudService(
-            SessionModel session,
-            CoinsModel coins,
-            AimTrainerConfig config,
-            SessionHudView sessionHudView,
-            CoinsHudView coinsHudView)
+        SessionHudPresenter _sessionHudPresenter;
+        CoinsHudPresenter _coinsHudPresenter;
+        CoinsRewardPresenter _coinsRewardPresenter;
+
+        public void Initialize()
         {
-            if (sessionHudView != null)
+            if (_sessionHudView != null)
             {
-                _sessionHudPresenter = new SessionHudPresenter(session, sessionHudView);
+                _sessionHudPresenter = new SessionHudPresenter(_session, _sessionHudView);
                 _sessionHudPresenter.Initialize();
             }
 
-            if (coinsHudView != null)
+            if (_coinsHudView != null)
             {
-                _coinsHudPresenter = new CoinsHudPresenter(coins, coinsHudView);
+                _coinsHudPresenter = new CoinsHudPresenter(_coins, _coinsHudView);
                 _coinsHudPresenter.Initialize();
             }
             else
@@ -36,9 +38,11 @@ namespace Aim.Services
                 Debug.LogWarning("HudService: CoinsHudView is not assigned. Run Aim/Rebuild Coins HUD.");
             }
 
-            _coinsRewardPresenter = new CoinsRewardPresenter(coins, session, config);
+            _coinsRewardPresenter = new CoinsRewardPresenter(_coins, _session, _config);
             _coinsRewardPresenter.Initialize();
         }
+
+        void OnDestroy() => Dispose();
 
         public void Dispose()
         {
