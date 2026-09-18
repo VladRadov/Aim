@@ -5,8 +5,6 @@ namespace Aim.Services
 {
     public sealed class LevelRecordsStore
     {
-        const string Prefix = "Aim.LevelRecord.";
-
         public bool TryUpdateRecord(
             LevelDefinition definition,
             bool won,
@@ -18,16 +16,19 @@ namespace Aim.Services
             if (definition == null || !won)
                 return false;
 
-            var key = Prefix + definition.name;
-            var bestAccuracy = PlayerPrefs.GetFloat(key + ".Accuracy", -1f);
-            var bestTime = PlayerPrefs.GetFloat(key + ".Time", float.MaxValue);
+            var record = GameSaveService.Current.Data.GetOrCreateRecord(definition.name);
+            if (record == null)
+                return false;
+
+            var bestAccuracy = record.Accuracy;
+            var bestTime = record.Time;
             var isNew = false;
 
             if (definition.AllowsShooting)
             {
                 if (accuracy01 > bestAccuracy + 0.0001f)
                 {
-                    PlayerPrefs.SetFloat(key + ".Accuracy", accuracy01);
+                    record.Accuracy = accuracy01;
                     note = "Новый рекорд точности!";
                     isNew = true;
                 }
@@ -35,13 +36,13 @@ namespace Aim.Services
 
             if (durationSeconds < bestTime - 0.01f)
             {
-                PlayerPrefs.SetFloat(key + ".Time", durationSeconds);
+                record.Time = durationSeconds;
                 note = isNew ? "Новые рекорды!" : "Новый рекорд времени!";
                 isNew = true;
             }
 
             if (isNew)
-                PlayerPrefs.Save();
+                GameSaveService.Current.Flush();
 
             return isNew;
         }

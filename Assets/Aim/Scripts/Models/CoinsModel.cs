@@ -1,4 +1,5 @@
 using System;
+using Aim.Services;
 using UniRx;
 using UnityEngine;
 
@@ -6,15 +7,14 @@ namespace Aim.Models
 {
     public sealed class CoinsModel : IDisposable
     {
-        const string CoinsKey = "Aim.Coins";
-
         readonly ReactiveProperty<int> _balance;
 
         public IReadOnlyReactiveProperty<int> Balance => _balance;
 
         public CoinsModel()
         {
-            _balance = new ReactiveProperty<int>(Mathf.Max(0, PlayerPrefs.GetInt(CoinsKey, 0)));
+            _balance = new ReactiveProperty<int>(Mathf.Max(0, GameSaveService.Current.Data.Coins));
+            GameSaveService.Current.Loaded += ApplyLoaded;
         }
 
         public void Add(int amount)
@@ -23,7 +23,7 @@ namespace Aim.Models
                 return;
 
             _balance.Value += amount;
-            Save();
+            Persist();
         }
 
         public bool TrySpend(int amount)
@@ -35,22 +35,31 @@ namespace Aim.Models
                 return false;
 
             _balance.Value -= amount;
-            Save();
+            Persist();
             return true;
         }
 
         public void SetBalance(int amount)
         {
             _balance.Value = Mathf.Max(0, amount);
-            Save();
+            Persist();
         }
 
-        void Save()
+        void ApplyLoaded()
         {
-            PlayerPrefs.SetInt(CoinsKey, _balance.Value);
-            PlayerPrefs.Save();
+            _balance.Value = Mathf.Max(0, GameSaveService.Current.Data.Coins);
         }
 
-        public void Dispose() => _balance.Dispose();
+        void Persist()
+        {
+            GameSaveService.Current.Data.Coins = _balance.Value;
+            GameSaveService.Current.Flush();
+        }
+
+        public void Dispose()
+        {
+            GameSaveService.Current.Loaded -= ApplyLoaded;
+            _balance.Dispose();
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using Aim.Services;
 using UniRx;
 using UnityEngine;
 
@@ -6,9 +7,6 @@ namespace Aim.Models
 {
     public sealed class SettingsModel : IDisposable
     {
-        const string MusicKey = "Aim.MusicVolume";
-        const string SfxKey = "Aim.SfxVolume";
-
         readonly ReactiveProperty<float> _musicVolume;
         readonly ReactiveProperty<float> _sfxVolume;
         readonly ReactiveProperty<bool> _isOpen = new(false);
@@ -19,20 +17,22 @@ namespace Aim.Models
 
         public SettingsModel()
         {
-            _musicVolume = new ReactiveProperty<float>(PlayerPrefs.GetFloat(MusicKey, 0.7f));
-            _sfxVolume = new ReactiveProperty<float>(PlayerPrefs.GetFloat(SfxKey, 0.85f));
+            var data = GameSaveService.Current.Data;
+            _musicVolume = new ReactiveProperty<float>(Mathf.Clamp01(data.MusicVolume));
+            _sfxVolume = new ReactiveProperty<float>(Mathf.Clamp01(data.SfxVolume));
+            GameSaveService.Current.Loaded += ApplyLoaded;
         }
 
         public void SetMusicVolume(float value)
         {
             _musicVolume.Value = Mathf.Clamp01(value);
-            PlayerPrefs.SetFloat(MusicKey, _musicVolume.Value);
+            GameSaveService.Current.Data.MusicVolume = _musicVolume.Value;
         }
 
         public void SetSfxVolume(float value)
         {
             _sfxVolume.Value = Mathf.Clamp01(value);
-            PlayerPrefs.SetFloat(SfxKey, _sfxVolume.Value);
+            GameSaveService.Current.Data.SfxVolume = _sfxVolume.Value;
         }
 
         public void Open() => _isOpen.Value = true;
@@ -40,7 +40,7 @@ namespace Aim.Models
         public void Close()
         {
             _isOpen.Value = false;
-            PlayerPrefs.Save();
+            GameSaveService.Current.Flush();
         }
 
         public void Toggle()
@@ -51,8 +51,16 @@ namespace Aim.Models
                 Open();
         }
 
+        void ApplyLoaded()
+        {
+            var data = GameSaveService.Current.Data;
+            _musicVolume.Value = Mathf.Clamp01(data.MusicVolume);
+            _sfxVolume.Value = Mathf.Clamp01(data.SfxVolume);
+        }
+
         public void Dispose()
         {
+            GameSaveService.Current.Loaded -= ApplyLoaded;
             _musicVolume.Dispose();
             _sfxVolume.Dispose();
             _isOpen.Dispose();

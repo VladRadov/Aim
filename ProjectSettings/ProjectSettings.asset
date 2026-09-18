@@ -823,24 +823,24 @@ PlayerSettings:
   webGLCloseOnQuit: 0
   webWasm2023: 0
   scriptingDefineSymbols:
-    Android: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
+    Android: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
     EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2
     GameCoreScarlett: UNITY_POST_PROCESSING_STACK_V2
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2
     Kepler: UNITY_POST_PROCESSING_STACK_V2
-    LinuxHeadlessSimulation: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
+    LinuxHeadlessSimulation: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
     Nintendo Switch 2: UNITY_POST_PROCESSING_STACK_V2
-    PS4: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    PS5: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
+    PS4: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    PS5: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
     QNX: UNITY_POST_PROCESSING_STACK_V2
-    Standalone: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
+    Standalone: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
     VisionOS: UNITY_POST_PROCESSING_STACK_V2
-    WebGL: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    Windows Store Apps: YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    XboxOne: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    iPhone: YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
-    tvOS: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2
+    WebGL: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    Windows Store Apps: YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    XboxOne: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    iPhone: YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
+    tvOS: UNITY_POST_PROCESSING_STACK_V2;YandexGamesPlatform_yg;PLUGIN_YG_2;RewardedAdv_yg;InterstitialAdv_yg;Localization_yg;AutoTranslateLangs_yg;TMP_YG2;RU_YG2;NJSON_YG2;Authorization_yg;Storage_yg
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

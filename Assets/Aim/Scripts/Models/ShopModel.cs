@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Aim.Config;
+using Aim.Services;
 using UniRx;
 using UnityEngine;
 
@@ -9,9 +10,6 @@ namespace Aim.Models
 {
     public sealed class ShopModel : IDisposable
     {
-        const string OwnedKey = "Aim.Shop.OwnedWeapons";
-        const string EquippedKey = "Aim.Shop.EquippedWeapon";
-
         readonly WeaponShopCatalog _catalog;
         readonly HashSet<string> _owned = new();
         readonly ReactiveProperty<bool> _isOpen = new(false);
@@ -27,6 +25,7 @@ namespace Aim.Models
         {
             _catalog = catalog;
             Load();
+            GameSaveService.Current.Loaded += ApplyLoaded;
         }
 
         public void Open() => _isOpen.Value = true;
@@ -84,7 +83,7 @@ namespace Aim.Models
                 return false;
 
             _owned.Add(weaponId);
-            SaveOwned();
+            Persist(flush: true);
             _inventoryChanged.OnNext(Unit.Default);
 
             if (string.IsNullOrEmpty(_equippedId.Value))
@@ -103,10 +102,15 @@ namespace Aim.Models
                 return false;
 
             _equippedId.Value = weaponId;
-            PlayerPrefs.SetString(EquippedKey, weaponId);
-            PlayerPrefs.Save();
+            Persist(flush: true);
             _inventoryChanged.OnNext(Unit.Default);
             return true;
+        }
+
+        void ApplyLoaded()
+        {
+            Load();
+            _inventoryChanged.OnNext(Unit.Default);
         }
 
         void Load()
@@ -123,7 +127,7 @@ namespace Aim.Models
                 }
             }
 
-            var saved = PlayerPrefs.GetString(OwnedKey, string.Empty);
+            var saved = GameSaveService.Current.Data.OwnedWeapons;
             if (!string.IsNullOrEmpty(saved))
             {
                 var parts = saved.Split('|');
@@ -134,14 +138,14 @@ namespace Aim.Models
                 }
             }
 
-            var equipped = PlayerPrefs.GetString(EquippedKey, string.Empty);
+            var equipped = GameSaveService.Current.Data.EquippedWeapon;
             if (!string.IsNullOrEmpty(equipped) && _owned.Contains(equipped) && FindById(equipped) != null)
             {
                 _equippedId.Value = equipped;
+                Persist(flush: false);
                 return;
             }
 
-            // Fallback: first owned entry, else first catalog entry marked owned-by-default / first valid.
             if (_catalog?.Weapons != null)
             {
                 for (var i = 0; i < _catalog.Weapons.Length; i++)
@@ -153,15 +157,25 @@ namespace Aim.Models
                     if (_owned.Contains(entry.Id))
                     {
                         _equippedId.Value = entry.Id;
-                        PlayerPrefs.SetString(EquippedKey, entry.Id);
-                        PlayerPrefs.Save();
+                        Persist(flush: false);
                         return;
                     }
                 }
             }
+
+            Persist(flush: false);
         }
 
-        void SaveOwned()
+        void Persist(bool flush)
+        {
+            var data = GameSaveService.Current.Data;
+            data.OwnedWeapons = JoinOwned();
+            data.EquippedWeapon = _equippedId.Value ?? string.Empty;
+            if (flush)
+                GameSaveService.Current.Flush();
+        }
+
+        string JoinOwned()
         {
             var builder = new StringBuilder();
             var first = true;
@@ -173,12 +187,12 @@ namespace Aim.Models
                 first = false;
             }
 
-            PlayerPrefs.SetString(OwnedKey, builder.ToString());
-            PlayerPrefs.Save();
+            return builder.ToString();
         }
 
         public void Dispose()
         {
+            GameSaveService.Current.Loaded -= ApplyLoaded;
             _isOpen.Dispose();
             _equippedId.Dispose();
             _inventoryChanged.Dispose();
