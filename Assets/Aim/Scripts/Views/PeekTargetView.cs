@@ -143,6 +143,7 @@ namespace Aim.Views
             ApplyColor(hiddenColor);
             SetColliderEnabled(false);
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
 
             PeekLoopAsync(Mathf.Max(0f, initialHideDelay)).Forget();
         }

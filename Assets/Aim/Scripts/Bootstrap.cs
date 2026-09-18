@@ -11,6 +11,7 @@ namespace Aim
     /// </summary>
     public sealed class Bootstrap : MonoBehaviour, IInitializable
     {
+        [Inject] AudioSettingsService _audioService;
         [Inject] GameplayService _gameplayService;
         [Inject] HudService _hudService;
         [Inject] SettingsMenuService _settingsMenuService;
@@ -30,6 +31,7 @@ namespace Aim
 
         public void Initialize()
         {
+            _audioService.Initialize();
             _gameplayService.Initialize();
             _hudService.Initialize();
             _settingsMenuService.Initialize();

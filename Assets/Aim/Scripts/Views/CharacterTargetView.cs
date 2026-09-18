@@ -86,6 +86,7 @@ namespace Aim.Views
                 PlayRandomIdleActionAnimation();
 
             MoveAsync(resolvedMode, runSpeed, jumpHeight, jumpInterval, lifetime, runHalfWidth).Forget();
+            AudioSettingsService.Current?.PlaySpawn();
         }
 
         void OnZoneHit(HitZoneView zone, Vector3 hitPoint, Vector3 hitNormal)

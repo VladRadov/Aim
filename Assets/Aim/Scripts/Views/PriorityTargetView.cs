@@ -47,6 +47,7 @@ namespace Aim.Views
             _isPriority = false;
             ApplyColor(normalColor);
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
         }
 
         public void SetPriority(bool isPriority)

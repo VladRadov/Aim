@@ -76,6 +76,7 @@ namespace Aim.Views
             ApplyHpColor();
             UpdateHealthBar();
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
             LifetimeAsync(lifetime).Forget();
         }
 

@@ -15,6 +15,7 @@ namespace Aim.Presenters
         readonly ProjectileService _projectileService;
         readonly AimDirectionService _aimDirectionService;
         readonly ParticleFxService _fxService;
+        readonly AudioSettingsService _audioService;
         readonly InputView _inputView;
         readonly WeaponView _weaponView;
         readonly Camera _shootCamera;
@@ -30,6 +31,7 @@ namespace Aim.Presenters
             ProjectileService projectileService,
             AimDirectionService aimDirectionService,
             ParticleFxService fxService,
+            AudioSettingsService audioService,
             InputView inputView,
             WeaponView weaponView,
             Camera shootCamera)
@@ -40,6 +42,7 @@ namespace Aim.Presenters
             _projectileService = projectileService;
             _aimDirectionService = aimDirectionService;
             _fxService = fxService;
+            _audioService = audioService;
             _inputView = inputView;
             _weaponView = weaponView;
             _shootCamera = shootCamera;
@@ -67,6 +70,7 @@ namespace Aim.Presenters
                 return;
 
             _acceptedShotSubject.OnNext(Unit.Default);
+            _audioService?.PlayShoot();
 
             var origin = _weaponView.GetProjectileSpawnPosition();
             var direction = _aimDirectionService.GetDirection(_shootCamera, origin);
@@ -82,6 +86,10 @@ namespace Aim.Presenters
                 HitResolver.ApplyOnHit(result);
 
                 _shootModel.RegisterShot(result);
+                if (result.CountsAsScore)
+                    _audioService?.PlayHit();
+                else
+                    _audioService?.PlayMiss();
 
                 if (result.CountsAsScore)
                     _sessionModel.RegisterScoreHit();

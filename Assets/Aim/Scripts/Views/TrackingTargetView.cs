@@ -114,6 +114,7 @@ namespace Aim.Views
             }
 
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
 
             body.isKinematic = true;
             transform.SetPositionAndRotation(position, Quaternion.identity);
@@ -140,6 +141,7 @@ namespace Aim.Views
             SetTracked(true);
             _health = Mathf.Max(0f, _health - amount);
             UpdateHealthBar();
+            AudioSettingsService.Current?.PlayHealthDrain();
 
             if (_health > 0f)
                 return false;

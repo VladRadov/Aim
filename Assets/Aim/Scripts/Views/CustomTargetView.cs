@@ -1,5 +1,6 @@
 using System;
 using Aim.Models;
+using Aim.Services;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ namespace Aim.Views
             _onScoredHit = onScoredHit;
             _isActive = true;
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
 
             foreach (var zone in hitZones)
                 zone?.ResetState();

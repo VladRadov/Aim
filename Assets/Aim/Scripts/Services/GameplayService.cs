@@ -21,9 +21,10 @@ namespace Aim.Services
         [Inject] WeaponView _weaponView;
         [Inject] CrosshairView _crosshairView;
         [Inject] Camera _shootCamera;
+        [Inject] AudioSettingsService _audioService;
         [Inject(Id = "ProjectilesRoot")] Transform _projectilesRoot;
         [Inject] ShopModel _shopModel;
-            [Inject(Id = "DefaultWeapon", Optional = true)] GameObject _defaultWeapon;
+        [Inject(Id = "DefaultWeapon", Optional = true)] GameObject _defaultWeapon;
 
         ProjectilePool _projectilePool;
         ParticleFxService _fxService;
@@ -31,6 +32,7 @@ namespace Aim.Services
         ShootPresenter _shootPresenter;
         CrosshairPresenter _crosshairPresenter;
         RecoilPresenter _recoilPresenter;
+        bool _initialized;
 
         public AimModel AimModel => _aimModel;
         public ShootModel ShootModel => _shootModel;
@@ -68,6 +70,7 @@ namespace Aim.Services
                 projectileService,
                 aimDirectionService,
                 _fxService,
+                _audioService,
                 _inputView,
                 _weaponView,
                 _shootCamera);
@@ -94,6 +97,8 @@ namespace Aim.Services
             var startingWeapon = ResolveStartingWeaponPrefab();
             if (startingWeapon != null)
                 EquipWeaponPrefab(startingWeapon);
+
+            _initialized = true;
         }
 
         public void EquipWeaponPrefab(GameObject weaponPrefab)
@@ -103,6 +108,8 @@ namespace Aim.Services
 
             _weaponView.AttachWeapon(weaponPrefab);
             _fxService.BindMuzzle(_weaponView.MuzzlePoint);
+            if (_initialized)
+                _audioService?.PlayWeaponChange();
         }
 
         public void EquipWeaponById(string weaponId)

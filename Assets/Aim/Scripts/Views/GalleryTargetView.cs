@@ -1,5 +1,6 @@
 using System;
 using Aim.Models;
+using Aim.Services;
 using UnityEngine;
 
 namespace Aim.Views
@@ -63,6 +64,7 @@ namespace Aim.Views
             _isFallen = false;
             _isHighlighted = false;
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
             ResetPoseAndPhysics();
             ApplyVisual();
         }

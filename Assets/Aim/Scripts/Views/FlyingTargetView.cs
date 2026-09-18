@@ -66,6 +66,7 @@ namespace Aim.Views
             _isActive = true;
             ApplyColor(normalColor);
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
             FlyAsync(direction.normalized, speed, lifetime).Forget();
         }
 
@@ -82,6 +83,7 @@ namespace Aim.Views
             _isActive = true;
             ApplyColor(normalColor);
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
             RailAsync(start, end, Mathf.Max(0.1f, speed), lifetime).Forget();
         }
 

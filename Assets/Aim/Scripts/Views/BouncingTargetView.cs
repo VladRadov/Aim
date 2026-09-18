@@ -76,6 +76,7 @@ namespace Aim.Views
             body.WakeUp();
 
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
 
             if (lifetime > 0f)
                 LifetimeAsync(lifetime).Forget();

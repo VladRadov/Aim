@@ -85,6 +85,7 @@ namespace Aim.Views
 
             transform.SetPositionAndRotation(position, Quaternion.identity);
             gameObject.SetActive(true);
+            AudioSettingsService.Current?.PlaySpawn();
             ApplyColor(normalColor);
             UpdateHealthBar();
             MoveAsync().Forget();
@@ -98,6 +99,7 @@ namespace Aim.Views
             SetTracked(true);
             _health = Mathf.Max(0f, _health - amount);
             UpdateHealthBar();
+            AudioSettingsService.Current?.PlayHealthDrain();
 
             if (_health > 0f)
                 return false;
