@@ -16,10 +16,34 @@ namespace Aim.Views
         InputAction _lookAction;
         InputAction _attackAction;
         bool _uiCapture;
+        bool _onScreenAim;
 
         public IObservable<Vector2> LookStream => _lookSubject;
         public IObservable<Unit> AttackStream => _attackSubject;
         public bool IsUiCapture => _uiCapture;
+
+        public void PushLook(Vector2 delta)
+        {
+            if (_uiCapture || delta == Vector2.zero)
+                return;
+
+            _lookSubject.OnNext(delta);
+        }
+
+        public void PushAttack()
+        {
+            if (_uiCapture)
+                return;
+
+            _attackSubject.OnNext(Unit.Default);
+        }
+
+        public void SetOnScreenAim(bool enabled)
+        {
+            _onScreenAim = enabled;
+            if (enabled)
+                UnlockCursor();
+        }
 
         void Awake()
         {
@@ -41,14 +65,18 @@ namespace Aim.Views
                     if (_uiCapture)
                         return;
 
-                    var lookDelta = _lookAction.ReadValue<Vector2>();
-                    if (lookDelta != Vector2.zero)
-                        _lookSubject.OnNext(lookDelta);
+                    if (!_onScreenAim)
+                    {
+                        var lookDelta = _lookAction.ReadValue<Vector2>();
+                        if (lookDelta != Vector2.zero)
+                            _lookSubject.OnNext(lookDelta);
 
-                    if (_attackAction.WasPressedThisFrame())
-                        _attackSubject.OnNext(Unit.Default);
+                        if (_attackAction.WasPressedThisFrame())
+                            _attackSubject.OnNext(Unit.Default);
+                    }
 
-                    if (Mouse.current != null &&
+                    if (!_onScreenAim &&
+                        Mouse.current != null &&
                         Mouse.current.leftButton.wasPressedThisFrame &&
                         Cursor.visible)
                         LockCursor();
@@ -81,6 +109,12 @@ namespace Aim.Views
 
         public void LockCursor()
         {
+            if (_onScreenAim)
+            {
+                UnlockCursor();
+                return;
+            }
+
             // Confined + hidden keeps mouse look via delta, but UI (settings gear) stays clickable.
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = false;
